@@ -12,10 +12,25 @@ const Order = require('./models/Order');
 const app = express();
 
 // ✅ CORS for frontend
-app.use(cors({
-  origin: ['https://samrth.netlify.app', 'http://localhost:5173'],
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'https://samrth.netlify.app',
+      'http://localhost:5173'
+    ];
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
+
 
 app.use(express.json());
 app.use('/api/owner', ownerAuthRoutes);
