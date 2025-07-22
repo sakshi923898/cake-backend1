@@ -13,7 +13,7 @@ const app = express();
 
 // ✅ CORS for frontend
 app.use(cors({
-  origin: ['https://legendary-sprinkles-9e0733.netlify.app', 'http://localhost:5173'],
+  origin: ['https://samrth.netlify.app', 'http://localhost:5173'],
   credentials: true,
 }));
 
