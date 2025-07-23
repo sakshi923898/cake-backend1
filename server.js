@@ -11,6 +11,8 @@ const ownerAuthRoutes = require('./routes/ownerAuthRoutes');
 const Order = require('./models/Order');
 const app = express();
 
+/* ------------------------- Middleware Setup ------------------------ */
+
 // ✅ CORS for frontend
 const corsOptions = {
   origin: function (origin, callback) {
@@ -30,40 +32,44 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
-
 app.use(express.json());
-app.use('/api/owner', ownerAuthRoutes);
 
-// ✅ Connect to MongoDB
+/* ------------------------- MongoDB Connection ---------------------- */
+
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error(err));
+.then(() => console.log('✅ MongoDB connected'))
+.catch(err => console.error('❌ MongoDB connection error:', err));
 
-// ✅ Mongoose Cake model
+/* --------------------------- Models Setup -------------------------- */
+
 const Cake = mongoose.model('Cake', new mongoose.Schema({
   name: String,
   price: Number,
   description: String,
-  imageUrl: String, // Will store Cloudinary image URL
+  imageUrl: String, // Cloudinary image URL
 }));
 
-// ✅ Cloudinary Storage Setup
+/* ------------------------- File Upload Setup ----------------------- */
+
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: 'cake-shop',
-    allowed_formats: ['jpg', 'png', 'jpeg'],
+    allowed_formats: ['jpg', 'jpeg', 'png'],
   },
 });
+
 const upload = multer({ storage });
 
-/* --------------------------- Cake Routes -------------------------- */
+/* ----------------------------- Routes ------------------------------ */
 
-// Get all cakes
+// ✅ Owner Auth Routes
+app.use('/api/owner', ownerAuthRoutes);
+
+// ✅ Get all cakes
 app.get('/api/cakes', async (req, res) => {
   try {
     const cakes = await Cake.find();
@@ -73,34 +79,32 @@ app.get('/api/cakes', async (req, res) => {
   }
 });
 
-// Upload new cake (Cloudinary)
+// ✅ Upload new cake
 app.post('/api/cakes', upload.single('image'), async (req, res) => {
   try {
     const { name, price, description } = req.body;
-    const imageUrl = req.file.path; // ✅ Cloudinary URL
+    const imageUrl = req.file.path; // Cloudinary image URL
     const newCake = new Cake({ name, price, description, imageUrl });
     await newCake.save();
     res.status(201).json({ message: 'Cake added successfully', cake: newCake });
   } catch (error) {
-    console.error('Error uploading cake:', error);
+    console.error('❌ Error uploading cake:', error);
     res.status(500).json({ message: 'Error uploading cake' });
   }
 });
 
-// Delete cake
+// ✅ Delete cake
 app.delete('/api/cakes/:id', async (req, res) => {
   try {
     const cake = await Cake.findByIdAndDelete(req.params.id);
     if (!cake) return res.status(404).json({ message: 'Cake not found' });
     res.status(200).json({ message: 'Cake deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting cake' });
   }
 });
 
-/* -------------------------- Order Routes -------------------------- */
-
-// Get all orders
+// ✅ Get all orders
 app.get('/api/orders', async (req, res) => {
   try {
     const orders = await Order.find().populate('cakeId');
@@ -110,18 +114,18 @@ app.get('/api/orders', async (req, res) => {
   }
 });
 
-// Place new order
+// ✅ Place a new order
 app.post('/api/orders', async (req, res) => {
   try {
     const order = new Order(req.body);
     await order.save();
-    res.status(201).json({ message: 'Order placed' });
+    res.status(201).json({ message: 'Order placed successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error placing order' });
   }
 });
 
-// Confirm delivery
+// ✅ Confirm order as delivered
 app.patch('/api/orders/:id/confirm', async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -131,12 +135,12 @@ app.patch('/api/orders/:id/confirm', async (req, res) => {
     await order.save();
     res.status(200).json({ message: 'Order confirmed as delivered' });
   } catch (error) {
-    console.error('Error confirming delivery:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('❌ Error confirming delivery:', error);
+    res.status(500).json({ message: 'Error confirming delivery' });
   }
 });
 
-/* ---------------------------- Start App --------------------------- */
+/* ---------------------------- Server Start ------------------------- */
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
