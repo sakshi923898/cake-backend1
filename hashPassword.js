@@ -6,5 +6,5 @@ async function hashPassword(plainPassword) {
   console.log("Hashed Password:", hashed);
 }
 
-hashPassword("Swapn123"); // Replace with your real password
-// Hashed Password: $2b$10$FDXwAQ00FXbnAgMqVrle3.23cA8Cy8uK1txa3HvmcpWUIOzVeDAH2
+hashPassword("Swapn1234"); // Replace with your real password
+// Hashed Password: $2b$10$GCcouQpmraQWPL/UV1HGdeJuNaJ67s11w9XNHnPGYNRxGinKrnMAa
