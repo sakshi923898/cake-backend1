@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const Owner = require('../models/Owner'); // Make sure this path is correct
+const Owner = require('../models/Owner');
 
 // Owner login route
 router.post('/login', async (req, res) => {
