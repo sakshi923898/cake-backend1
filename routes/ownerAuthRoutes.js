@@ -5,9 +5,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Owner = require("../models/Owner"); // Ensure correct path
 
-router.get('/test', (req, res) => {
-  res.send("✅ Owner route is reachable");
-});
 
 // POST /api/owner/login
 router.post("/login", async (req, res) => {
