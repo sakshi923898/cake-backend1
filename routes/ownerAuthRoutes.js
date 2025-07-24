@@ -8,7 +8,7 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const owner = await Owner.findOne({ email });
+    const owner = await Owner.findOne({ email: email });
 
     if (!owner) {
       return res.status(404).json({ message: 'Owner not found' });
