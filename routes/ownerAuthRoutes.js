@@ -32,28 +32,28 @@ router.post('/login', async (req, res) => {
 
 
 // TEMPORARY ROUTE TO ADD DEFAULT OWNER ON RENDER
-router.post('/create-test-owner', async (req, res) => {
-  const { email, password } = req.body;
+// router.post('/create-test-owner', async (req, res) => {
+//   const { email, password } = req.body;
 
-  try {
-    const existingOwner = await Owner.findOne({ email });
-    if (existingOwner) {
-      return res.status(400).json({ message: 'Owner already exists' });
-    }
+//   try {
+//     const existingOwner = await Owner.findOne({ email });
+//     if (existingOwner) {
+//       return res.status(400).json({ message: 'Owner already exists' });
+//     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+//     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newOwner = new Owner({
-      email,
-      password: hashedPassword
-    });
+//     const newOwner = new Owner({
+//       email,
+//       password: hashedPassword
+//     });
 
-    await newOwner.save();
-    res.status(201).json({ message: 'Test owner created successfully' });
-  } catch (error) {
-    console.error('Error creating test owner:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+//     await newOwner.save();
+//     res.status(201).json({ message: 'Test owner created successfully' });
+//   } catch (error) {
+//     console.error('Error creating test owner:', error);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// });
 
 module.exports = router;
