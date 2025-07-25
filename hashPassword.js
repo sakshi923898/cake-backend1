@@ -41,3 +41,7 @@ async function addOwner() {
 }
 
 addOwner();
+// postman token
+// {
+//     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvd25lcklkIjoiNjg4MmU0NWEzYmM2Y2U4NmQxMjZlYzNiIiwiaWF0IjoxNzUzNDA4Njg5LCJleHAiOjE3NTM0OTUwODl9.kjzNhrD-KPcOEDsuPn2EmSekLRX49ojYzJdPZ4ooTrY"
+// }
