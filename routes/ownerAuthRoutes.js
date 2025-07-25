@@ -33,29 +33,26 @@ router.post('/login', async (req, res) => {
 
 // TEMPORARY ROUTE TO ADD DEFAULT OWNER ON RENDER
 router.post('/create-test-owner', async (req, res) => {
+  const { email, password } = req.body;
+
   try {
-    const bcrypt = require('bcryptjs');
-
-    // Replace with your actual owner email and password
-    const email = 'satyavita81@gmail.com';
-    const plainPassword = 'Swapn1234';
-
-    // Check if already exists
     const existingOwner = await Owner.findOne({ email });
     if (existingOwner) {
       return res.status(400).json({ message: 'Owner already exists' });
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(plainPassword, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new owner
-    const newOwner = new Owner({ email, password: hashedPassword });
+    const newOwner = new Owner({
+      email,
+      password: hashedPassword
+    });
+
     await newOwner.save();
-
-    res.status(201).json({ message: '✅ Owner created successfully on Render DB' });
+    res.status(201).json({ message: 'Test owner created successfully' });
   } catch (error) {
-    res.status(500).json({ message: '❌ Error creating owner', error: error.message });
+    console.error('Error creating test owner:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
