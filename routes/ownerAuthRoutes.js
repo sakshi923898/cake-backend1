@@ -64,5 +64,22 @@ router.get('/orders', verifyOwner, async (req, res) => {
 //     res.status(500).json({ message: 'Server error' });
 //   }
 // });
+router.post('/orders', async (req, res) => {
+  const { cakeId, customerName, contactNumber, address } = req.body;
+
+  try {
+    const newOrder = new Order({
+      cakeId,
+      customerName,
+      contactNumber, // ✅ important
+      address,
+    });
+
+    await newOrder.save();
+    res.status(201).json({ message: 'Order placed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to place order' });
+  }
+});
 
 module.exports = router;
