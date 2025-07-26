@@ -31,20 +31,6 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-router.post('/orders', async (req, res) => {
-  const { cakeId, customerName, contactNumber, price } = req.body;
-
-  const newOrder = new Order({
-    cakeId,
-    customerName,
-    contactNumber,  // ⬅️ ensure this is received and stored
-    price,
-  });
-
-  await newOrder.save();
-  res.status(201).json({ message: 'Order placed successfully' });
-});
-
 router.get('/orders', verifyOwner, async (req, res) => {
   try {
     const orders = await Order.find().populate('cakeId');
