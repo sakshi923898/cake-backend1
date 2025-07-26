@@ -112,30 +112,15 @@ app.get('/api/orders', async (req, res) => {
 });
 
 // ✅ Place a new order
-// ✅ Place a new order (with contactNumber properly handled)
 app.post('/api/orders', async (req, res) => {
   try {
-    const { customerName, contactNumber, address, cakeId } = req.body;
-
-    if (!customerName || !contactNumber || !address || !cakeId) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    const order = new Order({
-      customerName,
-      contactNumber,
-      address,
-      cakeId,
-      status: 'Pending',
-    });
-
+    const order = new Order(req.body);
     await order.save();
-    res.status(201).json({ message: 'Order placed successfully', order });
+    res.status(201).json({ message: 'Order placed successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error placing order' });
   }
 });
-
 
 // ✅ Confirm order as delivered
 app.patch('/api/orders/:id/confirm', async (req, res) => {
