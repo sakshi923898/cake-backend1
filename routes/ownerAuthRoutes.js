@@ -31,7 +31,14 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
+router.get('/orders', verifyOwner, async (req, res) => {
+  try {
+    const orders = await Order.find().populate('cakeId');
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch orders.' });
+  }
+});
 
 // TEMPORARY ROUTE TO ADD DEFAULT OWNER ON RENDER
 // router.post('/create-test-owner', async (req, res) => {
