@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
   customerName: { type: String, required: true },
-  contactNumber: { type: String, required: true },
   address: { type: String, required: true },
   status: { type: String, default: 'Pending' },
   cakeId: {
