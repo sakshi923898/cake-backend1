@@ -37,8 +37,8 @@ app.use(express.json());
 /* ------------------------- MongoDB Connection ---------------------- */
 
 mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log('✅ MongoDB connected'))
-.catch(err => console.error('❌ MongoDB connection error:', err));
+  .then(() => console.log('✅ MongoDB connected'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
 
 /* --------------------------- Models Setup -------------------------- */
 
@@ -117,9 +117,8 @@ const Order = require('./models/Order');
 
 app.post('/api/orders', async (req, res) => {
   try {
-    const { cakeId, customerName, customerContact } = req.body;
-
-    const newOrder = new Order({ cakeId, customerName, customerContact });
+    const { cakeId, customerName, contact, address } = req.body;
+    const newOrder = new Order({ cakeId, customerName, contact, address });
     await newOrder.save();
 
     res.status(201).json({ message: 'Order placed successfully', order: newOrder });
