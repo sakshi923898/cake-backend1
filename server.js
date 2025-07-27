@@ -117,6 +117,7 @@ const Order = require('./models/Order');
 
 app.post('/api/orders', async (req, res) => {
   try {
+    console.log('Order request body:', req.body);  
     const { cakeId, customerName, contact, address } = req.body;
     const newOrder = new Order({ cakeId, customerName, contact, address });
     await newOrder.save();
