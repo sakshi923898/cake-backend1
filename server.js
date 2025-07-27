@@ -107,20 +107,28 @@ app.get('/api/orders', async (req, res) => {
     const orders = await Order.find().populate('cakeId');
     res.json(orders);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching orders' });
+    console.error('Fetch order error:', error);
+    res.status(500).json({ message: 'Failed to fetch orders' });
   }
 });
 
 // ✅ Place a new order
+const Order = require('./models/Order');
+
 app.post('/api/orders', async (req, res) => {
   try {
-    const order = new Order(req.body);
-    await order.save();
-    res.status(201).json({ message: 'Order placed successfully' });
+    const { cakeId, customerName, customerContact } = req.body;
+
+    const newOrder = new Order({ cakeId, customerName, customerContact });
+    await newOrder.save();
+
+    res.status(201).json({ message: 'Order placed successfully', order: newOrder });
   } catch (error) {
-    res.status(500).json({ message: 'Error placing order' });
+    console.error('Order error:', error);
+    res.status(500).json({ message: 'Failed to place order' });
   }
 });
+
 
 // ✅ Confirm order as delivered
 app.patch('/api/orders/:id/confirm', async (req, res) => {
