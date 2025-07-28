@@ -65,13 +65,13 @@ router.get('/orders', verifyOwner, async (req, res) => {
 //   }
 // });
 router.post('/orders', async (req, res) => {
-  const { cakeId, customerName, contactNumber, address } = req.body;
+  const { cakeId, customerName, contact, address } = req.body;
 
   try {
     const newOrder = new Order({
       cakeId,
       customerName,
-      contactNumber, // ✅ important
+      contact, // ✅ important
       address,
     });
 
