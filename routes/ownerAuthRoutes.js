@@ -66,7 +66,7 @@ router.get('/orders', verifyOwner, async (req, res) => {
 // });
 router.post('/orders', async (req, res) => {
   const { cakeId, customerName, contact, address } = req.body;
-
+  console.log('Order request body:', req.body);
   try {
     const newOrder = new Order({
       cakeId,
