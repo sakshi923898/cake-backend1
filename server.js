@@ -113,7 +113,7 @@ app.get('/api/orders', async (req, res) => {
 });
 
 // ✅ Place a new order
-const Order = require('./models/Order');
+
 
 app.post('/api/orders', async (req, res) => {
   try {
