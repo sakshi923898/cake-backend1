@@ -71,7 +71,7 @@ router.post('/orders', async (req, res) => {
     const newOrder = new Order({
       cakeId,
       customerName,
-      // contact, // ✅ important
+      contact, // ✅ important
       address,
     });
 
