@@ -102,27 +102,27 @@ app.delete('/api/cakes/:id', async (req, res) => {
 });
 
 // ✅ Get all orders
-// app.get('/api/orders', async (req, res) => {
-//   try {
-//     const orders = await Order.find().populate('cakeId');
-//     res.json(orders);
-//   } catch (error) {
-//     console.error('Fetch order error:', error);
-//     res.status(500).json({ message: 'Failed to fetch orders' });
-//   }
-// });
-// Get orders of a specific customer
-app.get('/api/orders/:customerName', async (req, res) => {
-  const customerName = req.params.customerName;
-
+app.get('/api/orders', async (req, res) => {
   try {
-    const customerOrders = await Order.find({ customerName });
-    res.json(customerOrders);
-  } catch (err) {
-    console.error('Error fetching customer orders:', err);
-    res.status(500).json({ message: 'Error fetching orders' });
+    const orders = await Order.find().populate('cakeId');
+    res.json(orders);
+  } catch (error) {
+    console.error('Fetch order error:', error);
+    res.status(500).json({ message: 'Failed to fetch orders' });
   }
 });
+// Get orders of a specific customer
+// app.get('/api/orders/:customerName', async (req, res) => {
+//   const customerName = req.params.customerName;
+
+//   try {
+//     const customerOrders = await Order.find({ customerName });
+//     res.json(customerOrders);
+//   } catch (err) {
+//     console.error('Error fetching customer orders:', err);
+//     res.status(500).json({ message: 'Error fetching orders' });
+//   }
+// });
 
 
 // ✅ Place a new order
