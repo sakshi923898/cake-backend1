@@ -2,7 +2,10 @@ const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
   customerName: String,
-  contact: String,            
+  contact: {
+  type: String,
+  required: true,
+},          
   address: String,
   cakeId: {
     type: mongoose.Schema.Types.ObjectId,

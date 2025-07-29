@@ -112,17 +112,7 @@ app.get('/api/orders', async (req, res) => {
   }
 });
 // Get orders of a specific customer
-// app.get('/api/orders/:customerName', async (req, res) => {
-//   const customerName = req.params.customerName;
 
-//   try {
-//     const customerOrders = await Order.find({ customerName });
-//     res.json(customerOrders);
-//   } catch (err) {
-//     console.error('Error fetching customer orders:', err);
-//     res.status(500).json({ message: 'Error fetching orders' });
-//   }
-// });
 
 
 // ✅ Place a new order
