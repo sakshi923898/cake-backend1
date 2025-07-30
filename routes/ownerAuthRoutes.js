@@ -98,7 +98,7 @@ router.get("/orders", async (req, res) => {
     res.status(500).json({ message: "Failed to fetch orders" });
   }
 });
-// POST /api/orders/by-contact
+
 // GET orders by contact number
 router.get('/by-contact/:contact', async (req, res) => {
   const contact = req.params.contact;
