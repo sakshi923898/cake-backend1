@@ -129,8 +129,4 @@ router.get('/by-contact', async (req, res) => {
   }
 });
 
-
-
-
-
 module.exports = router;
