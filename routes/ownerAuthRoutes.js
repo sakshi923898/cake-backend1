@@ -114,6 +114,20 @@ router.post('/by-contact', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+// Example route
+router.get('/by-contact', async (req, res) => {
+  const contact = req.query.contact;
+
+  try {
+    const orders = await Order.find({ customerContact: contact });
+    if (!orders.length) {
+      return res.status(404).json({ message: 'No orders found' });
+    }
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 
 
