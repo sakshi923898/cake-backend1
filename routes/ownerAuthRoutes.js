@@ -61,19 +61,19 @@ router.post('/orders', async (req, res) => {
 });
 
 // 🔍 Get orders by customer name (public)
-router.get('/orders/search', async (req, res) => {
-  try {
-    const { customerName } = req.query;
+// router.get('/orders/search', async (req, res) => {
+//   try {
+//     const { customerName } = req.query;
 
-    const orders = customerName
-      ? await Order.find({ customerName })
-      : await Order.find();
+//     const orders = customerName
+//       ? await Order.find({ customerName })
+//       : await Order.find();
 
-    res.json(orders);
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch orders' });
-  }
-});
+//     res.json(orders);
+//   } catch (error) {
+//     res.status(500).json({ message: 'Failed to fetch orders' });
+//   }
+// });
 
 // 📞 Get orders by contact number (Controller-based)
 router.get('/orders/by-contact', getOrdersByContact);
