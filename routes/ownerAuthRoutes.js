@@ -101,16 +101,20 @@ router.get("/orders", async (req, res) => {
 
 
 // GET orders by contact number
-router.get('/by-contact/:contact', async (req, res) => {
-  const { contact } = req.params;
+router.post('/by-contact', async (req, res) => {
+  const { contact } = req.body;
   try {
     const orders = await Order.find({ contact }).populate('cakeId');
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ message: 'Contact not found. Please place an order first.' });
+    }
     res.json(orders);
-  } catch (err) {
-    console.error('Error fetching orders by contact:', err);
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 
 
