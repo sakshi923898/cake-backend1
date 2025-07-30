@@ -101,16 +101,36 @@ router.get("/orders", async (req, res) => {
 
 
 // GET orders by contact number
-router.post('/by-contact', async (req, res) => {
-  const { contact } = req.body;
+// router.post('/by-contact', async (req, res) => {
+//   const { contact } = req.body;
+//   try {
+//     const orders = await Order.find({ contact }).populate('cakeId');
+//     if (!orders || orders.length === 0) {
+//       return res.status(404).json({ message: 'Contact not found. Please place an order first.' });
+//     }
+//     res.json(orders);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// });
+// Get orders by contact number
+router.get('/by-contact', async (req, res) => {
   try {
-    const orders = await Order.find({ contact }).populate('cakeId');
+    const contact = req.query.contact;
+
+    if (!contact) {
+      return res.status(400).json({ message: 'Contact number is required' });
+    }
+
+    const orders = await Order.find({ contact });
+
     if (!orders || orders.length === 0) {
       return res.status(404).json({ message: 'Contact not found. Please place an order first.' });
     }
-    res.json(orders);
+
+    res.status(200).json(orders);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
 });
