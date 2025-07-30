@@ -99,15 +99,16 @@ router.get("/orders", async (req, res) => {
   }
 });
 
+
 // GET orders by contact number
 router.get('/by-contact/:contact', async (req, res) => {
-  const contact = req.params.contact;
-
+  const { contact } = req.params;
   try {
-    const orders = await Order.find({ contact });
-    res.status(200).json(orders);
+    const orders = await Order.find({ contact }).populate('cakeId');
+    res.json(orders);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch customer orders' });
+    console.error('Error fetching orders by contact:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
