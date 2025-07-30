@@ -10,6 +10,8 @@ require('dotenv').config();
 const ownerAuthRoutes = require('./routes/ownerAuthRoutes');
 const Order = require('./models/Order');
 const app = express();
+const orderRoutes = require('./routes/orderRoutes'); // or your path
+app.use('/api/orders', orderRoutes);
 
 /* ------------------------- Middleware Setup ------------------------ */
 

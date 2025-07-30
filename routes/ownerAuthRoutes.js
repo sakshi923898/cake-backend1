@@ -99,21 +99,18 @@ router.get("/orders", async (req, res) => {
   }
 });
 // POST /api/orders/by-contact
-router.post('/orders/by-contact', async (req, res) => {
-  const { contact } = req.body;
+// GET orders by contact number
+router.get('/by-contact/:contact', async (req, res) => {
+  const contact = req.params.contact;
 
   try {
-    if (!contact) {
-      return res.status(400).json({ message: 'Contact is required' });
-    }
-
-    const orders = await Order.find({ contact }).populate('cakeId');
-    res.json(orders);
+    const orders = await Order.find({ contact });
+    res.status(200).json(orders);
   } catch (err) {
-    console.error('Error fetching customer orders:', err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ error: 'Failed to fetch customer orders' });
   }
 });
+
 
 
 
