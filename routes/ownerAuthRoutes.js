@@ -98,6 +98,23 @@ router.get("/orders", async (req, res) => {
     res.status(500).json({ message: "Failed to fetch orders" });
   }
 });
+// POST /api/orders/by-contact
+router.post('/orders/by-contact', async (req, res) => {
+  const { contact } = req.body;
+
+  try {
+    if (!contact) {
+      return res.status(400).json({ message: 'Contact is required' });
+    }
+
+    const orders = await Order.find({ contact }).populate('cakeId');
+    res.json(orders);
+  } catch (err) {
+    console.error('Error fetching customer orders:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 
 module.exports = router;
