@@ -11,7 +11,7 @@ const ownerAuthRoutes = require('./routes/ownerAuthRoutes');
 const Order = require('./models/Order');
 const app = express();
 // const orderRoutes = require('./routes/orderRoutes'); // or your path
-//  const orderRoutes = require('./routes/ownerAuthRoutes');
+ const orderRoutes = require('./routes/ownerAuthRoutes');
 app.use('/api/owner', orderRoutes);
 
 /* ------------------------- Middleware Setup ------------------------ */
