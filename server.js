@@ -155,25 +155,6 @@ app.patch('/api/orders/:id/confirm', async (req, res) => {
   }
 });
 
-
-// DELETE invalid orders with missing contact number
-app.delete('/cleanup/invalid-orders', async (req, res) => {
-  try {
-    const result = await Order.deleteMany({
-      $or: [
-        { contact: { $exists: false } },
-        { contact: null },
-        { contact: '' }
-      ]
-    });
-    res.status(200).json({ message: 'Invalid orders deleted', deletedCount: result.deletedCount });
-  } catch (error) {
-    console.error('Error cleaning orders:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-
 /* ---------------------------- Server Start ------------------------- */
 
 const PORT = process.env.PORT || 5000;
