@@ -33,7 +33,11 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+app.use(cors({
+  origin: 'https://samrth.netlify.app', // ✅ your frontend Netlify domain
+  credentials: true,
+}));
 app.use(express.json());
 
 /* ------------------------- MongoDB Connection ---------------------- */
