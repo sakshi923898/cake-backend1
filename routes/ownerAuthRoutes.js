@@ -76,6 +76,6 @@ router.get('/orders/search', async (req, res) => {
 });
 
 // 📞 Get orders by contact number (Controller-based)
-router.get('/orders/by-contact', getOrdersByContact);
+router.get("/orders/:contact", getOrdersByContact);
 
 module.exports = router;
