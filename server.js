@@ -157,7 +157,7 @@ app.patch('/api/orders/:id/confirm', async (req, res) => {
 
 
 // DELETE invalid orders with missing contact number
-router.delete('/cleanup/invalid-orders', async (req, res) => {
+app.delete('/cleanup/invalid-orders', async (req, res) => {
   try {
     const result = await Order.deleteMany({
       $or: [
