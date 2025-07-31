@@ -8,7 +8,7 @@ const getOrdersByContact = async (req, res) => {
   }
 
   try {
-    const orders = await Order.find({ contactNumber: contact });
+    const orders = await Order.find({ contact: contact });
     res.json(orders);
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
