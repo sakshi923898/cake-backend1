@@ -10,9 +10,10 @@ require('dotenv').config();
 const ownerAuthRoutes = require('./routes/ownerAuthRoutes');
 const Order = require('./models/Order');
 const app = express();
-// const orderRoutes = require('./routes/orderRoutes'); // or your path
-//  const orderRoutes = require('./routes/ownerAuthRoutes');
-// app.use('/api/owner', orderRoutes);
+const router = express.Router();
+const Owner = require("../models/Owner");
+const nodemailer = require('nodemailer');
+const sendEmailToOwners = require("../utils/sendEmail"); // Import the function
 
 /* ------------------------- Middleware Setup ------------------------ */
 
@@ -127,7 +128,7 @@ app.get('/api/orders', async (req, res) => {
 
 app.post('/api/orders', async (req, res) => {
   try {
-    console.log('Order request body:', req.body);  
+    console.log('Order request body:', req.body);
     const { cakeId, customerName, contact, address } = req.body;
     const newOrder = new Order({ cakeId, customerName, contact, address });
     await newOrder.save();
@@ -154,6 +155,44 @@ app.patch('/api/orders/:id/confirm', async (req, res) => {
     res.status(500).json({ message: 'Error confirming delivery' });
   }
 });
+
+// POST /api/orders
+router.post("/", async (req, res) => {
+  try {
+    const { customerName, customerPhone, cakeId, cakeName, quantity, price } = req.body;
+
+    const order = new Order({
+      customerName,
+      customerPhone,
+      cakeId,
+      cakeName,
+      quantity,
+      price,
+    });
+
+    await order.save();
+
+    // 🔔 Notify all owners by email
+    const owners = await Owner.find({}, "email");
+    const subject = "🆕 New Cake Order Received";
+    const message = `Customer Name: ${customerName}
+Phone: ${customerPhone}
+Cake: ${cakeName}
+Quantity: ${quantity}
+Total Price: ₹${price}
+
+Check your dashboard for full details.`;
+
+    await sendEmailToOwners(owners, subject, message);
+
+    res.status(201).json({ success: true, message: "Order placed and owner notified!" });
+  } catch (error) {
+    console.error("Order creation error:", error);
+    res.status(500).json({ success: false, message: "Failed to place order." });
+  }
+});
+
+
 
 /* ---------------------------- Server Start ------------------------- */
 
