@@ -5,30 +5,26 @@ require("dotenv").config();
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER, // ✅ Correct usage
-    pass: process.env.EMAIL_PASS, // ✅ Correct usage
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
-const sendOrderNotification = async (customerName, cakeName, customerContact) => {
+const sendEmailToOwners = async (owners, subject, message) => {
+  const emailList = owners.map(owner => owner.email);
   const mailOptions = {
     from: process.env.EMAIL_USER,
-    to: process.env.EMAIL_USER,
-    subject: "🎂 New Cake Order Placed!",
-    html: `
-      <h2>New Cake Order</h2>
-      <p><strong>Customer:</strong> ${customerName}</p>
-      <p><strong>Cake:</strong> ${cakeName}</p>
-      <p><strong>Contact:</strong> ${customerContact}</p>
-    `,
+    to: emailList,
+    subject,
+    text: message,
   };
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log("📧 Order notification sent to owner!");
+    console.log("📧 Order email sent to:", emailList);
   } catch (error) {
-    console.error("❌ Failed to send order email:", error);
+    console.error("❌ Email sending failed:", error);
   }
 };
 
-module.exports = sendOrderNotification;
+module.exports = sendEmailToOwners;
