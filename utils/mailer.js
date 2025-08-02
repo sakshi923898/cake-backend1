@@ -20,11 +20,15 @@ const sendEmailToOwners = async (owners, subject, message) => {
   };
 
   try {
+    console.log("📨 Attempting to send email to:", emailList);
+    console.log("Mail options:", mailOptions);
     await transporter.sendMail(mailOptions);
     console.log("📧 Order email sent to:", emailList);
   } catch (error) {
-    console.error("❌ Email sending failed:", error);
+    console.error("❌ Email sending failed:", error.message); // show message only
+    throw error; // very important
   }
 };
+
 
 module.exports = sendEmailToOwners;
