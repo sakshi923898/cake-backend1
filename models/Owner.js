@@ -1,16 +1,15 @@
-// models/Owner.js
 const mongoose = require('mongoose');
 
 const ownerSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
-  password: {
+  hashedPassword: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const Owner = mongoose.model('Owner', ownerSchema);
