@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
 
 const ownerSchema = new mongoose.Schema({
-  email: { type: String, required: true },
-  password: { type: String, required: true },
+  name: String,
+  email: String,
+  password: String
 });
 
-module.exports = mongoose.model('Owner', ownerSchema);
+const Owner = mongoose.model('Owner', ownerSchema);
+
 module.exports = Owner;
