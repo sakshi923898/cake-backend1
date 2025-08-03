@@ -14,7 +14,7 @@ const router = express.Router();
 const Owner = require('./models/Owner');
 const nodemailer = require('nodemailer');
 //  const sendEmailToOwners = require("../utils/mailer"); // Import the function
- const mailer = require('./utils/mailer');
+const mailer = require('./utils/mailer');
 
 /* ------------------------- Middleware Setup ------------------------ */
 
@@ -158,56 +158,72 @@ app.patch('/api/orders/:id/confirm', async (req, res) => {
 });
 
 
-app.post('/api/orders', async (req, res) => {
+// app.post('/api/orders', async (req, res) => {
+//   try {
+//     console.log('✅ Step 1: Order request body:', req.body);
+//     const { cakeId, customerName, contact, address, cakeName, quantity, price } = req.body;
+
+//     const newOrder = new Order({ cakeId, customerName, contact, address, cakeName, quantity, price });
+//     console.log("✅ Step 2: Saving order...");
+//     await newOrder.save();
+//     console.log("✅ Step 3: Order saved");
+
+//     const owners = await Owner.find({}, "email");
+//     console.log("✅ Step 4: Owners fetched", owners);
+
+//     const subject = "🆕 New Cake Order Received";
+//     const message = `Customer Name: ${customerName}
+// Phone: ${contact}
+// Cake: ${cakeName}
+// Quantity: ${quantity}
+// Total Price: ₹${price}
+
+// Check your dashboard for full details.`;
+
+//     console.log("✅ Step 5: Sending email...");
+//     await sendEmailToOwners(owners, subject, message);
+//     console.log("✅ Step 6: Email sent");
+
+//     res.status(201).json({ message: 'Order placed and owner notified!', order: newOrder });
+//   } catch (error) {
+//     console.error('❌ Order error:', error);
+//     res.status(500).json({ message: 'Failed to place order' });
+//   }
+// });
+
+router.post('/place-order', async (req, res) => {
   try {
-    console.log("✅ Step 1: Order route hit");
+    console.log("✅ Incoming Order:", req.body); // Log incoming request
 
-    const { cakeId, customerName, contactNumber } = req.body;
-    console.log("✅ Step 2: Request data received:", req.body);
+    const { customerName, contact, cakeId } = req.body;
 
-    // Step 3: Find the cake
-    const cake = await Cake.findById(cakeId);
-    if (!cake) {
-      return res.status(404).json({ error: 'Cake not found' });
+    if (!customerName || !contact || !cakeId) {
+      return res.status(400).json({ error: "Missing required fields" });
     }
-    console.log("✅ Step 3: Cake found");
 
-    // Step 4: Create the order
     const order = new Order({
-      cake: cakeId,
       customerName,
-      contactNumber,
-      status: 'Pending',
+      contact,
+      cake: cakeId,
+      status: "Pending"
     });
+
     await order.save();
-    console.log("✅ Step 4: Order saved to DB");
-
-    // Step 5: Find all owners
-    const owners = await Owner.find();
-    console.log("✅ Step 5: Owners fetched:", owners);
-
-    // Step 6: Email Notification (✅ Wrapped in try-catch)
-    const subject = "New Cake Order Received";
-    const message = `
-      Customer Name: ${customerName}
-      Contact Number: ${contactNumber}
-      Ordered Cake: ${cake.name}
-    `;
+    console.log("✅ Order saved to database");
 
     try {
-      await sendEmailToOwners(owners, subject, message);
-      console.log("✅ Step 6: Email sent");
+      await sendEmailToOwners(...); // Make sure this is defined and correct
+      console.log("✅ Email sent to owner");
     } catch (emailErr) {
-      console.error("❌ Email failed but order saved:", emailErr.message);
+      console.error("⚠️ Email failed but order saved:", emailErr.message);
     }
 
-    res.status(201).json({ message: 'Order placed successfully!' });
+    res.status(201).json({ message: "Order placed successfully" });
   } catch (err) {
-    console.error("❌ Main catch error:", err.message);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("❌ Backend Error:", err.message);
+    res.status(500).json({ error: "Server error while placing order" });
   }
 });
-
 
 
 
