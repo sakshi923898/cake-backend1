@@ -26,7 +26,8 @@ const sendEmailToOwners = async (owners, subject, message) => {
     console.log("📧 Order email sent to:", emailList);
   } catch (error) {
     console.error("❌ Email sending failed:", error.message); // show message only
-    throw error; // very important
+    throw new Error("Email failed");
+
   }
 };
 
