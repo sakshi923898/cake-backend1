@@ -190,41 +190,53 @@ app.patch('/api/orders/:id/confirm', async (req, res) => {
 //     res.status(500).json({ message: 'Failed to place order' });
 //   }
 // });
-
-router.post('/place-order', async (req, res) => {
+router.post('/api/orders', async (req, res) => {
   try {
-    console.log("✅ Incoming Order:", req.body); // Log incoming request
+    console.log('✅ Step 1: Order request body:', req.body);
+    const { cakeId, customerName, contact, address, cakeName, quantity, price } = req.body;
 
-    const { customerName, contact, cakeId } = req.body;
+    // Create new order
+    const newOrder = new Order({ cakeId, customerName, contact, address, cakeName, quantity, price });
+    console.log("✅ Step 2: Saving order...");
+    await newOrder.save();
+    console.log("✅ Step 3: Order saved");
 
-    if (!customerName || !contact || !cakeId) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
+    // Fetch owner emails
+    const owners = await Owner.find({}, "email");
+    console.log("✅ Step 4: Owners fetched", owners);
 
-    const order = new Order({
-      customerName,
-      contact,
-      cake: cakeId,
-      status: "Pending"
-    });
+    // Prepare email content
+    const subject = "🆕 New Cake Order Received";
+    const message = `
+🎂 New Cake Order 🎂
 
-    await order.save();
-    console.log("✅ Order saved to database");
+Customer Name: ${customerName}
+Contact: ${contact}
+Address: ${address}
+Cake: ${cakeName}
+Quantity: ${quantity}
+Total Price: ₹${price}
 
+👉 Please check the dashboard for full order details.
+`;
+
+    console.log("✅ Step 5: Sending email...");
+    
+    // Send email, but even if it fails, don't block the order placement
     try {
-      await mailer(owners, subject, message); // Make sure this is defined and correct
-      console.log("✅ Email sent to owner");
+      await sendEmailToOwners(owners, subject, message);
+      console.log("✅ Step 6: Email sent");
     } catch (emailErr) {
-      console.error("⚠️ Email failed but order saved:", emailErr.message);
+      console.error("❌ Email sending failed:", emailErr.message);
     }
 
-    res.status(201).json({ message: "Order placed successfully" });
-  } catch (err) {
-    console.error("❌ Backend Error:", err.message);
-    res.status(500).json({ error: "Server error while placing order" });
+    // Success response regardless of email status
+    res.status(201).json({ message: 'Order placed successfully!', order: newOrder });
+  } catch (error) {
+    console.error('❌ Order error:', error);
+    res.status(500).json({ message: 'Failed to place order' });
   }
 });
-
 
 
 /* ---------------------------- Server Start ------------------------- */
