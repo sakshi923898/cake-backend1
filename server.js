@@ -212,7 +212,7 @@ router.post('/place-order', async (req, res) => {
     console.log("✅ Order saved to database");
 
     try {
-      await sendEmailToOwners(...); // Make sure this is defined and correct
+      await mailer(owners, subject, message); // Make sure this is defined and correct
       console.log("✅ Email sent to owner");
     } catch (emailErr) {
       console.error("⚠️ Email failed but order saved:", emailErr.message);
