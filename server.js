@@ -13,8 +13,8 @@ const app = express();
 const router = express.Router();
 const Owner = require('./models/Owner');
 const nodemailer = require('nodemailer');
- const sendEmailToOwners = require("../utils/mailer"); // Import the function
-// const mailer = require('./utils/mailer');
+//  const sendEmailToOwners = require("../utils/mailer"); // Import the function
+ const mailer = require('./utils/mailer');
 
 /* ------------------------- Middleware Setup ------------------------ */
 
