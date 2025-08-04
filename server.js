@@ -143,36 +143,72 @@ app.get('/api/orders', async (req, res) => {
 
 
 // ✅ Confirm order as delivered
-app.patch('/api/orders/:id/confirm', async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id);
-    if (!order) return res.status(404).json({ message: 'Order not found' });
+// app.patch('/api/orders/:id/confirm', async (req, res) => {
+//   try {
+//     const order = await Order.findById(req.params.id);
+//     if (!order) return res.status(404).json({ message: 'Order not found' });
 
-    order.status = 'Delivered';
-    await order.save();
-    res.status(200).json({ message: 'Order confirmed as delivered' });
-  } catch (error) {
-    console.error('❌ Error confirming delivery:', error);
-    res.status(500).json({ message: 'Error confirming delivery' });
-  }
-});
+//     order.status = 'Delivered';
+//     await order.save();
+//     res.status(200).json({ message: 'Order confirmed as delivered' });
+//   } catch (error) {
+//     console.error('❌ Error confirming delivery:', error);
+//     res.status(500).json({ message: 'Error confirming delivery' });
+//   }
+// });
 
+
+// app.post('/api/orders', async (req, res) => {
+//   try {
+//     console.log('✅ Step 1: Order request body:', req.body);
+//     const { cakeId, customerName, contact, address, cakeName, quantity, price } = req.body;
+
+//     const newOrder = new Order({ cakeId, customerName, contact, address, cakeName, quantity, price });
+//     console.log("✅ Step 2: Saving order...");
+//     await newOrder.save();
+//     console.log("✅ Step 3: Order saved");
+
+//     const owners = await Owner.find({}, "email");
+//     console.log("✅ Step 4: Owners fetched", owners);
+
+//     const subject = "🆕 New Cake Order Received";
+//     const message = `Customer Name: ${customerName}
+// Phone: ${contact}
+// Cake: ${cakeName}
+// Quantity: ${quantity}
+// Total Price: ₹${price}
+
+// Check your dashboard for full details.`;
+
+//     console.log("✅ Step 5: Sending email...");
+//     await sendEmailToOwners(owners, subject, message);
+//     console.log("✅ Step 6: Email sent");
+
+//     res.status(201).json({ message: 'Order placed and owner notified!', order: newOrder });
+//   } catch (error) {
+//     console.error('❌ Order error:', error);
+//     res.status(500).json({ message: 'Failed to place order' });
+//   }
+// });
 
 app.post('/api/orders', async (req, res) => {
   try {
     console.log('✅ Step 1: Order request body:', req.body);
     const { cakeId, customerName, contact, address, cakeName, quantity, price } = req.body;
 
+    // Save order
     const newOrder = new Order({ cakeId, customerName, contact, address, cakeName, quantity, price });
     console.log("✅ Step 2: Saving order...");
     await newOrder.save();
     console.log("✅ Step 3: Order saved");
 
-    const owners = await Owner.find({}, "email");
-    console.log("✅ Step 4: Owners fetched", owners);
+    // Send email (separately)
+    try {
+      const owners = await Owner.find({}, "email");
+      console.log("✅ Step 4: Owners fetched", owners);
 
-    const subject = "🆕 New Cake Order Received";
-    const message = `Customer Name: ${customerName}
+      const subject = "🆕 New Cake Order Received";
+      const message = `Customer Name: ${customerName}
 Phone: ${contact}
 Cake: ${cakeName}
 Quantity: ${quantity}
@@ -180,63 +216,20 @@ Total Price: ₹${price}
 
 Check your dashboard for full details.`;
 
-    console.log("✅ Step 5: Sending email...");
-    await sendEmailToOwners(owners, subject, message);
-    console.log("✅ Step 6: Email sent");
+      console.log("✅ Step 5: Sending email...");
+      await sendEmailToOwners(owners, subject, message);
+      console.log("✅ Step 6: Email sent");
+    } catch (emailErr) {
+      console.error("⚠️ Email failed but order saved:", emailErr.message);
+    }
 
-    res.status(201).json({ message: 'Order placed and owner notified!', order: newOrder });
+    // Always respond with success if order is saved
+    res.status(201).json({ message: 'Order placed and owner notified (if possible)', order: newOrder });
   } catch (error) {
     console.error('❌ Order error:', error);
     res.status(500).json({ message: 'Failed to place order' });
   }
 });
-// router.post('/api/orders', async (req, res) => {
-//   try {
-//     console.log('✅ Step 1: Order request body:', req.body);
-//     const { cakeId, customerName, contact, address, cakeName, quantity, price } = req.body;
-
-//     // Create new order
-//     const newOrder = new Order({ cakeId, customerName, contact, address, cakeName, quantity, price });
-//     console.log("✅ Step 2: Saving order...");
-//     await newOrder.save();
-//     console.log("✅ Step 3: Order saved");
-
-//     // Fetch owner emails
-//     const owners = await Owner.find({}, "email");
-//     console.log("✅ Step 4: Owners fetched", owners);
-
-//     // Prepare email content
-//     const subject = "🆕 New Cake Order Received";
-//     const message = `
-// 🎂 New Cake Order 🎂
-
-// Customer Name: ${customerName}
-// Contact: ${contact}
-// Address: ${address}
-// Cake: ${cakeName}
-// Quantity: ${quantity}
-// Total Price: ₹${price}
-
-// 👉 Please check the dashboard for full order details.
-// `;
-
-//     console.log("✅ Step 5: Sending email...");
-    
-//     // Send email, but even if it fails, don't block the order placement
-//     try {
-//       await sendEmailToOwners(owners, subject, message);
-//       console.log("✅ Step 6: Email sent");
-//     } catch (emailErr) {
-//       console.error("❌ Email sending failed:", emailErr.message);
-//     }
-
-//     // Success response regardless of email status
-//     res.status(201).json({ message: 'Order placed successfully!', order: newOrder });
-//   } catch (error) {
-//     console.error('❌ Order error:', error);
-//     res.status(500).json({ message: 'Failed to place order' });
-//   }
-// });
 
 /* ---------------------------- Server Start ------------------------- */
 
