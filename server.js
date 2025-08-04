@@ -143,19 +143,19 @@ app.get('/api/orders', async (req, res) => {
 
 
 // ✅ Confirm order as delivered
-// app.patch('/api/orders/:id/confirm', async (req, res) => {
-//   try {
-//     const order = await Order.findById(req.params.id);
-//     if (!order) return res.status(404).json({ message: 'Order not found' });
+app.patch('/api/orders/:id/confirm', async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
 
-//     order.status = 'Delivered';
-//     await order.save();
-//     res.status(200).json({ message: 'Order confirmed as delivered' });
-//   } catch (error) {
-//     console.error('❌ Error confirming delivery:', error);
-//     res.status(500).json({ message: 'Error confirming delivery' });
-//   }
-// });
+    order.status = 'Delivered';
+    await order.save();
+    res.status(200).json({ message: 'Order confirmed as delivered' });
+  } catch (error) {
+    console.error('❌ Error confirming delivery:', error);
+    res.status(500).json({ message: 'Error confirming delivery' });
+  }
+});
 
 
 // app.post('/api/orders', async (req, res) => {
