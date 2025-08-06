@@ -163,7 +163,9 @@ app.post('/api/orders', async (req, res) => {
     await newOrder.save();
 
     // ✅ Notification logic inside the async block
-    const Notification = require('./models/Notification');
+    //const Notification = require('./models/Notification');
+    await Notification.create({ message: `New order placed by ${customerName}` });
+
     const cake = await Cake.findById(cakeId);
     const notification = new Notification({
       message: `New order from ${customerName} for ${cake?.name || 'a cake'}`,

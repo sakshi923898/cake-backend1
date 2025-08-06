@@ -1,17 +1,13 @@
-// routes/notification.js
+// routes/notificationRoutes.js
 
 const express = require('express');
 const router = express.Router();
-const Notification = require('../models/Notification'); // model path
+const {
+  getNotifications,
+  createNotification,
+} = require('../controllers/notificationController');
 
-// Get all notifications (for Owner)
-router.get('/', async (req, res) => {
-  try {
-    const notifications = await Notification.find().sort({ createdAt: -1 });
-    res.json(notifications);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching notifications' });
-  }
-});
+router.get('/', getNotifications);
+router.post('/', createNotification); // Add this line
 
 module.exports = router;
