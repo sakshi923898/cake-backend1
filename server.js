@@ -154,6 +154,40 @@ app.patch('/api/orders/:id/confirm', async (req, res) => {
   }
 });
 
+//notifaction logic 
+const Notification = require('./models/Notification'); // Import the model
+
+// After order is saved
+const notification = new Notification({
+  message: `New order from ${customerName} for ${cakeName}`,
+});
+await notification.save();
+console.log("📢 Notification created for owner");
+const Notification = require('./models/Notification');
+
+// Get all notifications
+app.get('/api/notifications', async (req, res) => {
+  try {
+    const notifications = await Notification.find().sort({ createdAt: -1 });
+    res.json(notifications);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching notifications' });
+  }
+});
+
+// Mark a notification as read
+app.patch('/api/notifications/:id/read', async (req, res) => {
+  try {
+    const notification = await Notification.findById(req.params.id);
+    if (!notification) return res.status(404).json({ message: 'Not found' });
+
+    notification.isRead = true;
+    await notification.save();
+    res.json({ message: 'Notification marked as read' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to update' });
+  }
+});
 
 
 
