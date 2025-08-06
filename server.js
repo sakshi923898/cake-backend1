@@ -126,19 +126,19 @@ app.get('/api/orders', async (req, res) => {
 
 // ✅ Place a new order
 
-app.post('/api/orders', async (req, res) => {
-  try {
-    console.log('Order request body:', req.body);
-    const { cakeId, customerName, contact, address } = req.body;
-    const newOrder = new Order({ cakeId, customerName, contact, address });
-    await newOrder.save();
+// app.post('/api/orders', async (req, res) => {
+//   try {
+//     console.log('Order request body:', req.body);
+//     const { cakeId, customerName, contact, address } = req.body;
+//     const newOrder = new Order({ cakeId, customerName, contact, address });
+//     await newOrder.save();
 
-    res.status(201).json({ message: 'Order placed successfully', order: newOrder });
-  } catch (error) {
-    console.error('Order error:', error);
-    res.status(500).json({ message: 'Failed to place order' });
-  }
-});
+//     res.status(201).json({ message: 'Order placed successfully', order: newOrder });
+//   } catch (error) {
+//     console.error('Order error:', error);
+//     res.status(500).json({ message: 'Failed to place order' });
+//   }
+// });
 
 
 // ✅ Confirm order as delivered
