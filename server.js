@@ -12,8 +12,8 @@ const Order = require('./models/Order');
 const app = express();
 const router = express.Router();
 const Owner = require('./models/Owner');
-
-
+const notificationRoutes = require('./routes/notification');
+app.use('/api/notifications', notificationRoutes);
 /* ------------------------- Middleware Setup ------------------------ */
 
 // ✅ CORS for frontend
