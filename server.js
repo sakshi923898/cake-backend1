@@ -186,7 +186,7 @@ app.post('/api/orders', async (req, res) => {
 
 // controllers/notificationController.js
 
-const Notification = require('../models/Notification');
+//const Notification = require('../models/Notification');
 
 const getNotifications = async (req, res) => {
   try {
