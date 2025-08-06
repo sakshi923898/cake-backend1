@@ -14,7 +14,7 @@ const router = express.Router();
 const Owner = require('./models/Owner');
 const notificationRoutes = require('./routes/notification');
 app.use('/api/notifications', notificationRoutes);
-const Notification = require('../models/Notification');
+//const Notification = require('../models/Notification');
 
 /* ------------------------- Middleware Setup ------------------------ */
 
