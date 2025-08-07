@@ -16,9 +16,6 @@ const notificationRoutes = require('./routes/notification');
 app.use('/api/notifications', notificationRoutes);
 const Notification = require('./models/Notification');
 
-const orderRoutes = require('./routes/orderRoutes');
-app.use('/api/orders', orderRoutes);
-
 /* ------------------------- Middleware Setup ------------------------ */
 
 // ✅ CORS for frontend
@@ -112,7 +109,6 @@ app.delete('/api/cakes/:id', async (req, res) => {
     res.status(500).json({ message: 'Error deleting cake' });
   }
 });
-
 
 // ✅ Get all orders
 app.get('/api/orders', async (req, res) => {

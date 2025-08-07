@@ -44,40 +44,29 @@ router.get('/orders', verifyOwner, async (req, res) => {
 
 //TEMPORARY ROUTE TO ADD DEFAULT OWNER ON RENDER
 
-// TEMPORARY: Delete all orders
-router.delete('/delete-all-orders', async (req, res) => {
+router.post('/create-test-owner', async (req, res) => {
+  const { email, password } = req.body;
+
   try {
-    const result = await Order.deleteMany({});
-    res.status(200).json({ message: 'All orders deleted', deletedCount: result.deletedCount });
+    const existingOwner = await Owner.findOne({ email });
+    if (existingOwner) {
+      return res.status(400).json({ message: 'Owner already exists' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newOwner = new Owner({
+      email,
+      password: hashedPassword
+    });
+
+    await newOwner.save();
+    res.status(201).json({ message: 'Test owner created successfully' });
   } catch (error) {
-    console.error('Error deleting orders:', error);
+    console.error('Error creating test owner:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
-
-// router.post('/create-test-owner', async (req, res) => {
-//   const { email, password } = req.body;
-
-//   try {
-//     const existingOwner = await Owner.findOne({ email });
-//     if (existingOwner) {
-//       return res.status(400).json({ message: 'Owner already exists' });
-//     }
-
-//     const hashedPassword = await bcrypt.hash(password, 10);
-
-//     const newOwner = new Owner({
-//       email,
-//       password: hashedPassword
-//     });
-
-//     await newOwner.save();
-//     res.status(201).json({ message: 'Test owner created successfully' });
-//   } catch (error) {
-//     console.error('Error creating test owner:', error);
-//     res.status(500).json({ message: 'Server error' });
-//   }
-// });
 // TEMPORARY DELETE ALL ORDERS ROUTE
 
 
