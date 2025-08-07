@@ -113,7 +113,7 @@ app.delete('/api/cakes/:id', async (req, res) => {
 // ✅ Get all orders
 app.get('/api/orders', async (req, res) => {
   try {
-    const orders = await Order.find().populate('cakeId');
+    const orders = await Order.find().populate('cakeId').sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
     console.error('Fetch order error:', error);

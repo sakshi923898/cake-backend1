@@ -35,7 +35,7 @@ router.post('/login', async (req, res) => {
 });
 router.get('/orders', verifyOwner, async (req, res) => {
   try {
-    const orders = await Order.find().populate('cakeId');
+    const orders = await Order.find().populate('cakeId').sort({ createdAt: -1 });
     res.json(orders);
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch orders.' });
