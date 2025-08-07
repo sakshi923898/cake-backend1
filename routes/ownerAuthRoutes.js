@@ -42,7 +42,7 @@ router.get('/orders', verifyOwner, async (req, res) => {
   }
 });
 
-// TEMPORARY ROUTE TO ADD DEFAULT OWNER ON RENDER
+//TEMPORARY ROUTE TO ADD DEFAULT OWNER ON RENDER
 router.post('/create-test-owner', async (req, res) => {
   const { email, password } = req.body;
 
@@ -66,6 +66,7 @@ router.post('/create-test-owner', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 router.post('/orders', async (req, res) => {
   const { cakeId, customerName, contactNumber, address } = req.body;
 
