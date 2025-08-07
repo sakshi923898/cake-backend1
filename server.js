@@ -16,6 +16,9 @@ const notificationRoutes = require('./routes/notification');
 app.use('/api/notifications', notificationRoutes);
 const Notification = require('./models/Notification');
 
+
+app.use('/api/orders', orderRoutes);
+
 /* ------------------------- Middleware Setup ------------------------ */
 
 // ✅ CORS for frontend
@@ -100,24 +103,16 @@ app.post('/api/cakes', upload.single('image'), async (req, res) => {
 });
 
 // ✅ Delete cake
-// app.delete('/api/cakes/:id', async (req, res) => {
-//   try {
-//     const cake = await Cake.findByIdAndDelete(req.params.id);
-//     if (!cake) return res.status(404).json({ message: 'Cake not found' });
-//     res.status(200).json({ message: 'Cake deleted successfully' });
-//   } catch (error) {
-//     res.status(500).json({ message: 'Error deleting cake' });
-//   }
-// });
-app.delete('/delete-all-orders', async (req, res) => {
+app.delete('/api/cakes/:id', async (req, res) => {
   try {
-    const result = await Order.deleteMany({});
-    res.status(200).json({ message: 'All customer orders deleted successfully', deletedCount: result.deletedCount });
+    const cake = await Cake.findByIdAndDelete(req.params.id);
+    if (!cake) return res.status(404).json({ message: 'Cake not found' });
+    res.status(200).json({ message: 'Cake deleted successfully' });
   } catch (error) {
-    console.error('Error deleting customer orders:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Error deleting cake' });
   }
 });
+
 
 // ✅ Get all orders
 app.get('/api/orders', async (req, res) => {

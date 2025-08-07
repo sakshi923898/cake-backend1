@@ -44,6 +44,17 @@ router.get('/orders', verifyOwner, async (req, res) => {
 
 //TEMPORARY ROUTE TO ADD DEFAULT OWNER ON RENDER
 
+// TEMPORARY: Delete all orders
+router.delete('/delete-all-orders', async (req, res) => {
+  try {
+    const result = await Order.deleteMany({});
+    res.status(200).json({ message: 'All orders deleted', deletedCount: result.deletedCount });
+  } catch (error) {
+    console.error('Error deleting orders:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // router.post('/create-test-owner', async (req, res) => {
 //   const { email, password } = req.body;
 
