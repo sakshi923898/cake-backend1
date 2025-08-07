@@ -68,7 +68,7 @@ router.get('/orders', verifyOwner, async (req, res) => {
 // });
 router.post('/orders', async (req, res) => {
   const { cakeId, customerName, contactNumber, address } = req.body;
-  
+
   try {
     const newOrder = new Order({
       cakeId,
@@ -76,6 +76,13 @@ router.post('/orders', async (req, res) => {
       contact, // ✅ important
       address,
     });
+
+    const cake = await Cake.findById(cakeId);
+    const notification = new Notification({
+      message: `New order for ${cake.name} from ${customerName}`,
+      isRead: false,
+    });
+        await notification.save();
 
     await newOrder.save();
     res.status(201).json({ message: 'Order placed successfully' });
