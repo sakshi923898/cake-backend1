@@ -17,7 +17,7 @@
 //   }
 // });
 
-module.exports = mongoose.model('Order', orderSchema);
+// module.exports = mongoose.model('Order', orderSchema);
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
