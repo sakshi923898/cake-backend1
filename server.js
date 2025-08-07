@@ -109,6 +109,15 @@ app.post('/api/cakes', upload.single('image'), async (req, res) => {
 //     res.status(500).json({ message: 'Error deleting cake' });
 //   }
 // });
+app.delete('/delete-all-orders', async (req, res) => {
+  try {
+    const result = await Order.deleteMany({});
+    res.status(200).json({ message: 'All customer orders deleted successfully', deletedCount: result.deletedCount });
+  } catch (error) {
+    console.error('Error deleting customer orders:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 // ✅ Get all orders
 app.get('/api/orders', async (req, res) => {
