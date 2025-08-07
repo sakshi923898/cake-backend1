@@ -16,7 +16,7 @@ const notificationRoutes = require('./routes/notification');
 app.use('/api/notifications', notificationRoutes);
 const Notification = require('./models/Notification');
 
-
+const orderRoutes = require('./routes/orderRoutes');
 app.use('/api/orders', orderRoutes);
 
 /* ------------------------- Middleware Setup ------------------------ */
