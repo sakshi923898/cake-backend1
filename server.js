@@ -100,15 +100,15 @@ app.post('/api/cakes', upload.single('image'), async (req, res) => {
 });
 
 // ✅ Delete cake
-app.delete('/api/cakes/:id', async (req, res) => {
-  try {
-    const cake = await Cake.findByIdAndDelete(req.params.id);
-    if (!cake) return res.status(404).json({ message: 'Cake not found' });
-    res.status(200).json({ message: 'Cake deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error deleting cake' });
-  }
-});
+// app.delete('/api/cakes/:id', async (req, res) => {
+//   try {
+//     const cake = await Cake.findByIdAndDelete(req.params.id);
+//     if (!cake) return res.status(404).json({ message: 'Cake not found' });
+//     res.status(200).json({ message: 'Cake deleted successfully' });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Error deleting cake' });
+//   }
+// });
 
 // ✅ Get all orders
 app.get('/api/orders', async (req, res) => {
