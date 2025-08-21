@@ -100,15 +100,22 @@ app.post('/api/cakes', upload.single('image'), async (req, res) => {
 });
 
 
-// DELETE all orders - TEMPORARY USE ONLY
+// TEMPORARY ROUTE - DELETE ALL ORDERS
+const Order = require("./models/Order"); // <-- make sure this path is correct
+
 app.delete("/api/orders/delete-all-orders", async (req, res) => {
-    try {
-        await Order.deleteMany({});
-        res.json({ message: "All orders deleted" });
-    } catch (err) {
-        res.status(500).json({ error: "Failed to delete orders" });
-    }
+  try {
+    const result = await Order.deleteMany({});
+    res.json({
+      message: "All orders deleted successfully",
+      deletedCount: result.deletedCount
+    });
+  } catch (err) {
+    console.error("Error deleting orders:", err);
+    res.status(500).json({ error: "Failed to delete orders" });
+  }
 });
+
 
 
 // // ✅ Delete cake
