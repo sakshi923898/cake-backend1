@@ -7,8 +7,6 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('./config/cloudinary');
 require('dotenv').config();
 
-import nodemailer from "nodemailer";
-
 const ownerAuthRoutes = require('./routes/ownerAuthRoutes');
 const Order = require('./models/Order.js');
 const app = express();
@@ -210,24 +208,6 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: "your_email@gmail.com",   // Owner's or system email
     pass: "your_app_password"       // App password (not raw email password)
-  }
-});
-
-app.post("/api/orders", async (req, res) => {
-  try {
-    const newOrder = new Order(req.body);
-    await newOrder.save();
-
-    // Fetch owner email (assuming you have stored it in DB)
-    const owner = await Owner.findOne();
-    if (owner) {
-      await sendOrderNotification(owner.email, newOrder);
-    }
-
-    res.status(201).json(newOrder);
-  } catch (error) {
-    console.error("Error creating order:", error);
-    res.status(500).json({ error: "Failed to create order" });
   }
 });
 
