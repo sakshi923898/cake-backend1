@@ -7,12 +7,14 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('./config/cloudinary');
 require('dotenv').config();
 
+import nodemailer from "nodemailer";
+
 const ownerAuthRoutes = require('./routes/ownerAuthRoutes');
 const Order = require('./models/Order');
 const app = express();
 const router = express.Router();
 const Owner = require('./models/Owner');
-const notificationRoutes = require('./routes/notification');
+const notificationRoutes = require('./routes/emailService.js');
 app.use('/api/notifications', notificationRoutes);
 const Notification = require('./models/Notification');
 
@@ -203,33 +205,32 @@ app.post('/api/orders', async (req, res) => {
 
 
 
-// controllers/notificationController.js
+const transporter = nodemailer.createTransport({
+  service: "gmail",   // You can use Gmail, Outlook, etc.
+  auth: {
+    user: "your_email@gmail.com",   // Owner's or system email
+    pass: "your_app_password"       // App password (not raw email password)
+  }
+});
 
-//const Notification = require('../models/Notification');
+app.post("/api/orders", async (req, res) => {
+  try {
+    const newOrder = new Order(req.body);
+    await newOrder.save();
 
-// const getNotifications = async (req, res) => {
-//   try {
-//     const notifications = await Notification.find().sort({ createdAt: -1 });
-//     res.status(200).json(notifications);
-//   } catch (err) {
-//     res.status(500).json({ error: 'Failed to fetch notifications' });
-//   }
-// };
-// const createNotification = async (req, res) => {
-//   try {
-//     const { message } = req.body;
-//     const notification = new Notification({ message });
-//     await notification.save();
-//     res.status(201).json(notification);
-//   } catch (error) {
-//     res.status(500).json({ message: 'Error creating notification', error });
-//   }
-// };
+    // Fetch owner email (assuming you have stored it in DB)
+    const owner = await Owner.findOne();
+    if (owner) {
+      await sendOrderNotification(owner.email, newOrder);
+    }
 
-// module.exports = {
-//   getNotifications,
-//   createNotification,
-// };
+    res.status(201).json(newOrder);
+  } catch (error) {
+    console.error("Error creating order:", error);
+    res.status(500).json({ error: "Failed to create order" });
+  }
+});
+
 
 /* ---------------------------- Server Start ------------------------- */
 
