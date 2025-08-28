@@ -8,7 +8,7 @@ const cloudinary = require('./config/cloudinary');
 require('dotenv').config();
 
 const ownerAuthRoutes = require('./routes/ownerAuthRoutes');
-const Order = require('./models/Order.js');
+const Order = require('./models/Order');
 const app = express();
 const router = express.Router();
 const Owner = require('./models/Owner');
