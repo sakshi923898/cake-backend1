@@ -10,11 +10,9 @@ require('dotenv').config();
 const ownerAuthRoutes = require('./routes/ownerAuthRoutes');
 const Order = require('./models/Order');
 const app = express();
-const router = express.Router();
-const Owner = require('./models/Owner');
-const notificationRoutes = require('./routes/emailService.js');
-app.use('/api/notifications', notificationRoutes);
-const Notification = require('./models/Notification');
+// const orderRoutes = require('./routes/orderRoutes'); // or your path
+//  const orderRoutes = require('./routes/ownerAuthRoutes');
+// app.use('/api/owner', orderRoutes);
 
 /* ------------------------- Middleware Setup ------------------------ */
 
@@ -99,25 +97,6 @@ app.post('/api/cakes', upload.single('image'), async (req, res) => {
   }
 });
 
-
-// // TEMPORARY ROUTE - DELETE ALL ORDERS
-// const Order = require("./models/Order"); // <-- make sure this path is correct
-
-// app.delete("/api/orders/delete-all-orders", async (req, res) => {
-//   try {
-//     const result = await Order.deleteMany({});
-//     res.json({
-//       message: "All orders deleted successfully",
-//       deletedCount: result.deletedCount
-//     });
-//   } catch (err) {
-//     console.error("Error deleting orders:", err);
-//     res.status(500).json({ error: "Failed to delete orders" });
-//   }
-// });
-
-
-
 // ✅ Delete cake
 app.delete('/api/cakes/:id', async (req, res) => {
   try {
@@ -132,7 +111,7 @@ app.delete('/api/cakes/:id', async (req, res) => {
 // ✅ Get all orders
 app.get('/api/orders', async (req, res) => {
   try {
-    const orders = await Order.find().populate('cakeId').sort({ createdAt: -1 });
+    const orders = await Order.find().populate('cakeId');
     res.json(orders);
   } catch (error) {
     console.error('Fetch order error:', error);
@@ -145,19 +124,20 @@ app.get('/api/orders', async (req, res) => {
 
 // ✅ Place a new order
 
-// app.post('/api/orders', async (req, res) => {
-//   try {
-//     console.log('Order request body:', req.body);
-//     const { cakeId, customerName, contact, address } = req.body;
-//     const newOrder = new Order({ cakeId, customerName, contact, address });
-//     await newOrder.save();
 
-//     res.status(201).json({ message: 'Order placed successfully', order: newOrder });
-//   } catch (error) {
-//     console.error('Order error:', error);
-//     res.status(500).json({ message: 'Failed to place order' });
-//   }
-// });
+app.post('/api/orders', async (req, res) => {
+  try {
+    console.log('Order request body:', req.body);  
+    const { cakeId, customerName, contact, address } = req.body;
+    const newOrder = new Order({ cakeId, customerName, contact, address });
+    await newOrder.save();
+
+    res.status(201).json({ message: 'Order placed successfully', order: newOrder });
+  } catch (error) {
+    console.error('Order error:', error);
+    res.status(500).json({ message: 'Failed to place order' });
+  }
+});
 
 
 // ✅ Confirm order as delivered
@@ -174,43 +154,6 @@ app.patch('/api/orders/:id/confirm', async (req, res) => {
     res.status(500).json({ message: 'Error confirming delivery' });
   }
 });
-
-//notifaction logic 
-app.post('/api/orders', async (req, res) => {
-  try {
-    console.log('Order request body:', req.body);
-    const { cakeId, customerName, contact, address } = req.body;
-    const newOrder = new Order({ cakeId, customerName, contact, address });
-    await newOrder.save();
-
-    // ✅ Notification logic inside the async block
-    //const Notification = require('./models/Notification');
-    await Notification.create({ message: `New order placed by ${customerName}` });
-
-    const cake = await Cake.findById(cakeId);
-    const notification = new Notification({
-      message: `New order from ${customerName} for ${cake?.name || 'a cake'}`,
-    });
-    await notification.save();
-    console.log("📢 Notification created for owner");
-
-    res.status(201).json({ message: 'Order placed successfully', order: newOrder });
-  } catch (error) {
-    console.error('Order error:', error);
-    res.status(500).json({ message: 'Failed to place order' });
-  }
-});
-
-
-
-const transporter = nodemailer.createTransport({
-  service: "gmail",   // You can use Gmail, Outlook, etc.
-  auth: {
-    user: "your_email@gmail.com",   // Owner's or system email
-    pass: "your_app_password"       // App password (not raw email password)
-  }
-});
-
 
 /* ---------------------------- Server Start ------------------------- */
 
