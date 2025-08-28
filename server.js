@@ -10,7 +10,7 @@ require('dotenv').config();
 import nodemailer from "nodemailer";
 
 const ownerAuthRoutes = require('./routes/ownerAuthRoutes');
-const Order = require('./models/Order');
+const Order = require('./models/Order.js');
 const app = express();
 const router = express.Router();
 const Owner = require('./models/Owner');
