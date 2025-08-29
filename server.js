@@ -12,7 +12,8 @@ const Order = require('./models/Order');
 const app = express();
 const Notification = require('./models/Notification');
 
-
+const Owner = require('./models/Owner'); // you already have this model
+const { sendOrderNotification } = require('./emailService');
 /* ------------------------- Middleware Setup ------------------------ */
 
 // ✅ CORS for frontend
@@ -143,19 +144,45 @@ app.get('/api/orders', async (req, res) => {
 //   }
 // });
 
-// ✅ Place a new order + create notification
+ // ✅ Place a new order + create notification
+// app.post('/api/orders', async (req, res) => {
+//   try {
+//     console.log('Order request body:', req.body);
+//     const { cakeId, customerName, contact, address } = req.body;
+
+//     const newOrder = new Order({ cakeId, customerName, contact, address });
+//     await newOrder.save();
+
+//     // 🔔 Create a notification for the owner
+//     await Notification.create({
+//       message: `New order from ${customerName} (contact: ${contact})`,
+//     });
+
+//     res.status(201).json({ message: 'Order placed successfully', order: newOrder });
+//   } catch (error) {
+//     console.error('Order error:', error);
+//     res.status(500).json({ message: 'Failed to place order' });
+//   }
+// });
+
+//placed order with email logic 
 app.post('/api/orders', async (req, res) => {
   try {
-    console.log('Order request body:', req.body);
     const { cakeId, customerName, contact, address } = req.body;
 
     const newOrder = new Order({ cakeId, customerName, contact, address });
     await newOrder.save();
 
-    // 🔔 Create a notification for the owner
     await Notification.create({
       message: `New order from ${customerName} (contact: ${contact})`,
     });
+
+    // Email owner (assuming single owner)
+    const owner = await Owner.findOne();
+    if (owner && owner.email) {
+      // ignore errors from email – don’t block API response
+      sendOrderNotification(owner.email, newOrder).catch(console.error);
+    }
 
     res.status(201).json({ message: 'Order placed successfully', order: newOrder });
   } catch (error) {
@@ -163,7 +190,6 @@ app.post('/api/orders', async (req, res) => {
     res.status(500).json({ message: 'Failed to place order' });
   }
 });
-
 
 // ✅ Confirm order as delivered
 app.patch('/api/orders/:id/confirm', async (req, res) => {
