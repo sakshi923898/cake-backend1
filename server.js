@@ -10,9 +10,8 @@ require('dotenv').config();
 const ownerAuthRoutes = require('./routes/ownerAuthRoutes');
 const Order = require('./models/Order');
 const app = express();
-// const orderRoutes = require('./routes/orderRoutes'); // or your path
-//  const orderRoutes = require('./routes/ownerAuthRoutes');
-// app.use('/api/owner', orderRoutes);
+const Notification = require('./models/Notification');
+
 
 /* ------------------------- Middleware Setup ------------------------ */
 
@@ -40,6 +39,12 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
+// server.js
+const notificationRoutes = require('./routes/notification');
+
+app.use('/api/notifications', notificationRoutes);
+
 
 /* ------------------------- MongoDB Connection ---------------------- */
 
@@ -124,13 +129,33 @@ app.get('/api/orders', async (req, res) => {
 
 // ✅ Place a new order
 
+// app.post('/api/orders', async (req, res) => {
+//   try {
+//     console.log('Order request body:', req.body);  
+//     const { cakeId, customerName, contact, address } = req.body;
+//     const newOrder = new Order({ cakeId, customerName, contact, address });
+//     await newOrder.save();
 
+//     res.status(201).json({ message: 'Order placed successfully', order: newOrder });
+//   } catch (error) {
+//     console.error('Order error:', error);
+//     res.status(500).json({ message: 'Failed to place order' });
+//   }
+// });
+
+// ✅ Place a new order + create notification
 app.post('/api/orders', async (req, res) => {
   try {
-    console.log('Order request body:', req.body);  
+    console.log('Order request body:', req.body);
     const { cakeId, customerName, contact, address } = req.body;
+
     const newOrder = new Order({ cakeId, customerName, contact, address });
     await newOrder.save();
+
+    // 🔔 Create a notification for the owner
+    await Notification.create({
+      message: `New order from ${customerName} (contact: ${contact})`,
+    });
 
     res.status(201).json({ message: 'Order placed successfully', order: newOrder });
   } catch (error) {
