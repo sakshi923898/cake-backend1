@@ -241,6 +241,30 @@ app.patch('/api/orders/:id/confirm', async (req, res) => {
   }
 });
 
+
+app.post("/api/owner/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const owner = await Owner.findOne({ email });
+    if (!owner) {
+      return res.status(401).json({ error: "Invalid email" });
+    }
+
+    const isMatch = await bcrypt.compare(password, owner.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: "Invalid password" });
+    }
+
+    const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+
+    res.json({ token });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 /* ---------------------------- Server Start ------------------------- */
 
 const PORT = process.env.PORT || 5000;
