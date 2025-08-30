@@ -166,22 +166,56 @@ app.get('/api/orders', async (req, res) => {
 // });
 
 //placed order with email logic 
+// app.post('/api/orders', async (req, res) => {
+//   try {
+//     const { cakeId, customerName, contact, address } = req.body;
+
+//     const newOrder = new Order({ cakeId, customerName, contact, address });
+//     await newOrder.save();
+
+//     await Notification.create({
+//       message: `New order from ${customerName} (contact: ${contact})`,
+//     });
+
+//     // Email owner (assuming single owner)
+//     const owner = await Owner.findOne();
+//     if (owner && owner.email) {
+//       // ignore errors from email – don’t block API response
+//       sendOrderNotification(owner.email, newOrder).catch(console.error);
+//     }
+
+//     res.status(201).json({ message: 'Order placed successfully', order: newOrder });
+//   } catch (error) {
+//     console.error('Order error:', error);
+//     res.status(500).json({ message: 'Failed to place order' });
+//   }
+// });
+
+
 app.post('/api/orders', async (req, res) => {
   try {
     const { cakeId, customerName, contact, address } = req.body;
 
-    const newOrder = new Order({ cakeId, customerName, contact, address });
-    await newOrder.save();
+    // 1) Create order
+    const newOrder = await Order.create({ cakeId, customerName, contact, address });
 
-    await Notification.create({
-      message: `New order from ${customerName} (contact: ${contact})`,
-    });
+    // 2) Collect owner emails from DB (owners who want notifications)
+    let emails = [];
+    try {
+      const owners = await Owner.find({ notify: true }).select('email -_id');
+      emails = owners.map(o => o.email);
+    } catch (e) {
+      console.error('Failed to read owners from DB:', e?.message || e);
+    }
 
-    // Email owner (assuming single owner)
-    const owner = await Owner.findOne();
-    if (owner && owner.email) {
-      // ignore errors from email – don’t block API response
-      sendOrderNotification(owner.email, newOrder).catch(console.error);
+    // 3) Fallback: also allow a comma-separated env var OWNER_EMAILS if needed
+    if (emails.length === 0 && process.env.OWNER_EMAILS) {
+      emails = process.env.OWNER_EMAILS.split(',').map(s => s.trim()).filter(Boolean);
+    }
+
+    // 4) Fire-and-forget email notifications (don’t block order creation on email)
+    if (emails.length) {
+      sendOrderNotificationToMany(emails, newOrder);
     }
 
     res.status(201).json({ message: 'Order placed successfully', order: newOrder });
@@ -190,6 +224,7 @@ app.post('/api/orders', async (req, res) => {
     res.status(500).json({ message: 'Failed to place order' });
   }
 });
+
 
 // ✅ Confirm order as delivered
 app.patch('/api/orders/:id/confirm', async (req, res) => {

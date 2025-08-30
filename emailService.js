@@ -2,7 +2,7 @@
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  service: 'satyavita81@gmail.com', // or your SMTP service
+  service: 'gmail', // or your SMTP service
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -26,7 +26,17 @@ Placed At: ${order.createdAt}
     to: toEmail,
     subject,
     text,
+
   });
 }
-
+// NEW: send to many (sends one email per recipient; failures don't block others)
+async function sendOrderNotificationToMany(emails, order) {
+  await Promise.all(
+    emails.map(email =>
+      sendOrderNotification(email, order).catch(err => {
+        console.error(`Email to ${email} failed:`, err?.message || err);
+      })
+    )
+  );
+}
 module.exports = { sendOrderNotification };
