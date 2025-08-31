@@ -66,7 +66,7 @@ router.post("/login", async (req, res) => {
 
     const owner = await Owner.findOne({ email });
     if (!owner) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({ message: "Owner not found" });
     }
 
     const isMatch = await bcrypt.compare(password, owner.password);
@@ -74,15 +74,19 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // ✅ Generate JWT token
-    const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+    const token = jwt.sign(
+      { ownerId: owner._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
 
-    res.json({ message: "Login successful", token, owner });
+    res.json({ token });
   } catch (error) {
-    console.error("❌ Login error:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error("Login error:", error.message); // 👈 log the actual error
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
+
 
 
 router.get('/orders', verifyOwner, async (req, res) => {
