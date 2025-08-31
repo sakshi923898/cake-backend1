@@ -60,32 +60,24 @@ const verifyOwner = require('../middleware/verifyOwner');
 //     res.status(500).json({ message: "Server error", error: error.message });
 //   }
 // });
-router.post("/login", async (req, res) => {
+router.post('/owner/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
     const owner = await Owner.findOne({ email });
-    if (!owner) {
-      return res.status(400).json({ message: "Owner not found" });
-    }
+    if (!owner) return res.status(400).json({ message: "Owner not found" });
 
-    const isMatch = await bcrypt.compare(password, owner.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
+    const isMatch = await bcrypt.compare(password, owner.hashedPassword);
+    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign(
-      { ownerId: owner._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
+    const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
     res.json({ token });
-  } catch (error) {
-    console.error("Login error:", error.message); // 👈 log the actual error
-    res.status(500).json({ message: "Server error", error: error.message });
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
+
 
 
 
