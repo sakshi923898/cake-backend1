@@ -35,29 +35,52 @@ const verifyOwner = require('../middleware/verifyOwner');
 //   }
 // });
 
+// router.post("/login", async (req, res) => {
+//   try {
+//     console.log("📩 Incoming login body:", req.body);   // 👈 log request
+//     const { email, password } = req.body;
+
+//     const owner = await Owner.findOne({ email });
+//     console.log("🗂️ Owner found:", owner);  // 👈 log DB record
+
+//     if (!owner) return res.status(400).json({ message: "Invalid credentials" });
+
+//     const isMatch = await bcrypt.compare(password, owner.password);
+//     console.log("🔑 Password match:", isMatch);  // 👈 log result
+
+//     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+
+//     const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET || "fallbacksecret", {
+//       expiresIn: "1d",
+//     });
+
+//     res.json({ message: "Login successful", token });
+//   } catch (error) {
+//     console.error("❌ Login error:", error);
+//     res.status(500).json({ message: "Server error", error: error.message });
+//   }
+// });
 router.post("/login", async (req, res) => {
   try {
-    console.log("📩 Incoming login body:", req.body);   // 👈 log request
     const { email, password } = req.body;
 
     const owner = await Owner.findOne({ email });
-    console.log("🗂️ Owner found:", owner);  // 👈 log DB record
-
-    if (!owner) return res.status(400).json({ message: "Invalid credentials" });
+    if (!owner) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
 
     const isMatch = await bcrypt.compare(password, owner.password);
-    console.log("🔑 Password match:", isMatch);  // 👈 log result
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
 
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+    // ✅ Generate JWT token
+    const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
-    const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET || "fallbacksecret", {
-      expiresIn: "1d",
-    });
-
-    res.json({ message: "Login successful", token });
+    res.json({ message: "Login successful", token, owner });
   } catch (error) {
     console.error("❌ Login error:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 });
 

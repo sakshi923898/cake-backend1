@@ -47,6 +47,7 @@ app.use(express.urlencoded({ extended: true }));
 const notificationRoutes = require('./routes/notification');
 
 app.use('/api/notifications', notificationRoutes);
+app.use("/api/owner", require("./routes/ownerAuthRoutes"));
 
 
 /* ------------------------- MongoDB Connection ---------------------- */
