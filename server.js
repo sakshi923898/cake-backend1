@@ -40,6 +40,8 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 
 // server.js
 const notificationRoutes = require('./routes/notification');
