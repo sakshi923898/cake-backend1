@@ -35,9 +35,6 @@ const verifyOwner = require('../middleware/verifyOwner');
 //   }
 // });
 
-const bcrypt = require("bcryptjs");
-const Owner = require("../models/Owner"); // adjust path
-
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
