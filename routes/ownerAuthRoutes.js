@@ -60,6 +60,8 @@ const verifyOwner = require('../middleware/verifyOwner');
 //     res.status(500).json({ message: "Server error", error: error.message });
 //   }
 // });
+const JWT_SECRET = "your_secret_key"; // use env var in real project
+
 router.post('/owner/login', async (req, res) => {
   try {
     const { email, password } = req.body;
