@@ -6,6 +6,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Order = require('../models/Order');
 const verifyOwner = require('../middleware/verifyOwner');
+const mongoose = require("mongoose");
+require("dotenv").config();
 
 // router.post('/login', async (req, res) => {
 //   const { email, password } = req.body;
@@ -61,21 +63,38 @@ const verifyOwner = require('../middleware/verifyOwner');
 //   }
 // });
 const JWT_SECRET = "your_secret_key"; // use env var in real project
+const ownerSchema = new mongoose.Schema({
+  email: String,
+  password: String,
+});
+const Owner = mongoose.model("Owner", ownerSchema);
 
-router.post('/owner/login', async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // Check if owner exists
     const owner = await Owner.findOne({ email });
-    if (!owner) return res.status(400).json({ message: "Owner not found" });
+    if (!owner) {
+      return res.status(400).json({ message: "❌ Owner not found" });
+    }
 
-    const isMatch = await bcrypt.compare(password, owner.hashedPassword);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+    // Compare password
+    const isMatch = await bcrypt.compare(password, owner.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "❌ Invalid credentials" });
+    }
 
-    const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+    // Generate JWT
+    const token = jwt.sign(
+      { ownerId: owner._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" } // token valid for 1 day
+    );
+
     res.json({ token });
-  } catch (err) {
-    console.error("Login error:", err);
+  } catch (error) {
+    console.error("❌ Error in owner login:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
