@@ -199,22 +199,26 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const owner = await Owner.findOne({ email });
-    if (!owner) {
-      return res.status(400).json({ message: "Invalid email or password" });
+    // 1. Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
     }
 
-    const isMatch = await bcrypt.compare(password, owner.password);
+    // 2. Compare passwords
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    res.json({ message: "Login successful!" });
-  } catch (err) {
-    console.error("❌ Login error:", err); // 👈 Add this
-    res.status(500).json({ message: "Server error", error: err.message });
+    // 3. Success
+    res.json({ message: "Login successful" });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
+
 
 
 // ✅ Protected orders route
