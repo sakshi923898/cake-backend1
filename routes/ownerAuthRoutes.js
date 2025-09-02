@@ -195,24 +195,27 @@ const verifyOwner = require('../middleware/verifyOwner');
 const JWT_SECRET = process.env.JWT_SECRET || "fallbacksecret";
 
 // ✅ Login route (correct path)
-router.post('/login', async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
     const owner = await Owner.findOne({ email });
-    if (!owner) return res.status(400).json({ message: "Owner not found" });
+    if (!owner) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
 
-    // ✅ Compare against "password", not "hashedPassword"
     const isMatch = await bcrypt.compare(password, owner.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
 
-    const token = jwt.sign({ ownerId: owner._id }, JWT_SECRET, { expiresIn: "1d" });
-    res.json({ message: "Login successful", token });
+    res.json({ message: "Login successful!" });
   } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ message: "Server error" });
+    console.error("❌ Login error:", err); // 👈 Add this
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 });
+
 
 // ✅ Protected orders route
 router.get('/orders', verifyOwner, async (req, res) => {
