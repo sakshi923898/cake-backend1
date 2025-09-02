@@ -7,7 +7,7 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('./config/cloudinary');
 require('dotenv').config();
 
-const ownerAuthRoutes = require('./routes/ownerAuthRoutes');
+const ownerRoutes = require('./routes/ownerAuthRoutes');
 const Order = require('./models/Order');
 const app = express();
 const Notification = require('./models/Notification');
