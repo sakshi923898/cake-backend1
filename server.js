@@ -53,13 +53,18 @@ app.use("/api/owner", require("./routes/ownerAuthRoutes"));
 
 /* ------------------------- MongoDB Connection ---------------------- */
 
-mongoose.connect(process.env.MONGO_URI, {
+// mongoose.connect(process.env.MONGO_URI, {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true
+// })
+//   .then(() => console.log('✅ MongoDB connected'))
+//   .catch(err => console.error('❌ MongoDB connection error:', err));
+mongoose.connect("mongodb://127.0.0.1:27017/cakeshop", {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 })
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
-
+.then(() => console.log("MongoDB Connected"))
+.catch((err) => console.error(err));
 /* --------------------------- Models Setup -------------------------- */
 
 const Cake = mongoose.model('Cake', new mongoose.Schema({

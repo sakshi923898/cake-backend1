@@ -194,30 +194,36 @@ const verifyOwner = require('../middleware/verifyOwner');
 
 const JWT_SECRET = process.env.JWT_SECRET || "fallbacksecret";
 
-// ✅ Login route (correct path)
-router.post("/login", async (req, res) => {
+// Route: Create Owner (for setup use only)
+router.post("/create-owner", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // 1. Check if user exists
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
+    // Check if already exists
+    const existingOwner = await Owner.findOne({ email });
+    if (existingOwner) {
+      return res.status(400).json({ message: "Owner already exists" });
     }
 
-    // 2. Compare passwords
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 3. Success
-    res.json({ message: "Login successful" });
+    // Save Owner
+    const newOwner = new Owner({
+      email,
+      password: hashedPassword,
+    });
+
+    await newOwner.save();
+
+    res.status(201).json({ message: "Owner created successfully", ownerId: newOwner._id });
   } catch (error) {
-    console.error("Login error:", error);
+    console.error(error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
+
+module.exports = router;
 
 
 
