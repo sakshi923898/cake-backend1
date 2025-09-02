@@ -63,8 +63,8 @@ mongoose.connect("mongodb://127.0.0.1:27017/cakeshop", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log("MongoDB Connected"))
-.catch((err) => console.error(err));
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error(err));
 /* --------------------------- Models Setup -------------------------- */
 
 const Cake = mongoose.model('Cake', new mongoose.Schema({
@@ -156,7 +156,7 @@ app.get('/api/orders', async (req, res) => {
 //   }
 // });
 
- // ✅ Place a new order + create notification
+// ✅ Place a new order + create notification
 // app.post('/api/orders', async (req, res) => {
 //   try {
 //     console.log('Order request body:', req.body);
