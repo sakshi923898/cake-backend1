@@ -67,7 +67,7 @@ const ownerSchema = new mongoose.Schema({
   email: String,
   password: String,
 });
-const Owner = mongoose.model("Owner", ownerSchema);
+
 
 router.post("/login", async (req, res) => {
   try {
