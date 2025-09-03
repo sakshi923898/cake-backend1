@@ -46,41 +46,30 @@
 // //     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvd25lcklkIjoiNjg4MmU0NWEzYmM2Y2U4NmQxMjZlYzNiIiwiaWF0IjoxNzUzNDA4Njg5LCJleHAiOjE3NTM0OTUwODl9.kjzNhrD-KPcOEDsuPn2EmSekLRX49ojYzJdPZ4ooTrY"
 // // }
 
+// hashPassword.js
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const Owner = require("./models/Owner"); 
 require("dotenv").config();
 
-// Load the Owner model
-const Owner = require("./models/Owner"); // make sure path is correct
-
-// Get MongoDB URI from .env
-const MONGO_URI = process.env.MONGO_URI;
-
-if (!MONGO_URI) {
-  console.error("❌ MONGO_URI is missing in .env file");
-  process.exit(1);
-}
-
-mongoose
-  .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("✅ Connected to MongoDB Atlas"))
-  .catch((err) => {
-    console.error("❌ MongoDB connection error:", err);
-    process.exit(1);
-  });
-
-// Function to add new owner
-async function addOwner(email, password) {
+async function createOwner() {
   try {
-    // Check if already exists
+    // Connect to MongoDB
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("✅ Connected to MongoDB");
+
+    const email = "sakshigaikwad313@gmail.com";
+    const plainPassword = "Swapn1234";
+
+    // Check if owner already exists
     const existingOwner = await Owner.findOne({ email });
     if (existingOwner) {
-      console.log("⚠️ Owner already exists!");
-      process.exit(0);
+      console.log("⚠️ Owner already exists! Skipping creation.");
+      return;
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
     // Create new owner
     const newOwner = new Owner({
@@ -89,13 +78,12 @@ async function addOwner(email, password) {
     });
 
     await newOwner.save();
-    console.log("✅ Owner created successfully:", email);
-    process.exit(0);
+    console.log("✅ Owner created successfully!");
   } catch (err) {
     console.error("❌ Error creating owner:", err);
-    process.exit(1);
+  } finally {
+    mongoose.disconnect();
   }
 }
 
-// 👉 Change email & password here
-addOwner("sakshigaikwad313@gmail.com", "Swapn1234");
+createOwner();
