@@ -69,6 +69,7 @@ const ownerSchema = new mongoose.Schema({
 });
 
 
+// POST /api/owner/login
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -82,22 +83,23 @@ router.post("/login", async (req, res) => {
     // Compare password
     const isMatch = await bcrypt.compare(password, owner.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "❌ Invalid credentials" });
+      return res.status(400).json({ message: "❌ Invalid password" });
     }
 
-    // Generate JWT
+    // Create JWT token
     const token = jwt.sign(
       { ownerId: owner._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" } // token valid for 1 day
+      process.env.JWT_SECRET || "mysecretkey",
+      { expiresIn: "1d" }
     );
 
     res.json({ token });
-  } catch (error) {
-    console.error("❌ Error in owner login:", error);
+  } catch (err) {
+    console.error("Login error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 
 
