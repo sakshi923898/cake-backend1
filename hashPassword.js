@@ -50,7 +50,7 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/cakeshop";
+// const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/cakeshop";
 
 const ownerSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
