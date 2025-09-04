@@ -207,32 +207,28 @@ const verifyOwner = require("../middleware/verifyOwner");
 require("dotenv").config();
 
 // POST /api/owner/login
+// Owner login route
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Check if owner exists
     const owner = await Owner.findOne({ email });
+
     if (!owner) {
-      return res.status(400).json({ message: "❌ Owner not found" });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // Compare plain text password with hashed one in DB
     const isMatch = await bcrypt.compare(password, owner.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "❌ Invalid password" });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    // Create JWT
-    const token = jwt.sign(
-      { ownerId: owner._id },
-      process.env.JWT_SECRET || "mysecretkey",
-      { expiresIn: "1d" }
-    );
+    const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
 
-    res.json({ message: "✅ Login successful", token });
+    res.json({ token });
   } catch (err) {
-    console.error("Login error:", err);
+    console.error("❌ Login error:", err);  // <--- add this
     res.status(500).json({ message: "Server error" });
   }
 });
