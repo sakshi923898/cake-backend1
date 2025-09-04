@@ -11,7 +11,7 @@ const ownerAuthRoutes = require('./routes/ownerAuthRoutes');
 const Order = require('./models/Order');
 const app = express();
 const Notification = require('./models/Notification');
-
+const ownerController=require('./controllers/ownerController');
 const Owner = require('./models/Owner'); // you already have this model
 const { sendOrderNotification } = require('./emailService');
 /* ------------------------- Middleware Setup ------------------------ */
