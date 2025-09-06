@@ -11,7 +11,7 @@ const ownerAuthRoutes = require('./routes/ownerAuthRoutes');
 const Order = require('./models/Order');
 const app = express();
 const Notification = require('./models/Notification');
-const ownerController=require('./controllers/ownerController');
+
 const Owner = require('./models/Owner'); // you already have this model
 const { sendOrderNotification } = require('./emailService');
 /* ------------------------- Middleware Setup ------------------------ */
@@ -40,23 +40,16 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-
 
 // server.js
 const notificationRoutes = require('./routes/notification');
 
 app.use('/api/notifications', notificationRoutes);
-app.use("/api/owner", require("./routes/ownerAuthRoutes"));
 
 
 /* ------------------------- MongoDB Connection ---------------------- */
 
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB connected'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
@@ -85,8 +78,6 @@ const upload = multer({ storage });
 
 // ✅ Owner Auth Routes
 app.use('/api/owner', ownerAuthRoutes);
-// Health check
-app.get('/', (_req, res) => res.send('OK'));
 
 // ✅ Get all cakes
 app.get('/api/cakes', async (req, res) => {
@@ -153,7 +144,7 @@ app.get('/api/orders', async (req, res) => {
 //   }
 // });
 
-// ✅ Place a new order + create notification
+ // ✅ Place a new order + create notification
 // app.post('/api/orders', async (req, res) => {
 //   try {
 //     console.log('Order request body:', req.body);
