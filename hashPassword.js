@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 
 // 🔁 Replace this with your actual MongoDB connection string if different
 //const MONGO_URI = "mongodb://localhost:27017/cakeshop";
-const MONGO_URI = "mongodb+srv://sakshigaikawad313_db_user:RvEiyX8SN3YpidPz@cluster0.idi5imw.mongodb.net/cakeshop?retryWrites=true&w=majority&appName=Cluster0";
+const MONGO_URI = "mongodb+srv://sakshisgaikwad92_db_user:1O5sh48sJUN19kHF@cluster0.4cge7ld.mongodb.net/cakeshop?retryWrites=true&w=majority&appName=Cluster0";
 
 const ownerSchema = new mongoose.Schema({
   email: String,
