@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
 // 🔁 Replace this with your actual MongoDB connection string if different
-const MONGO_URI = "mongodb://localhost:27017/cakeshop";
+//const MONGO_URI = "mongodb://localhost:27017/cakeshop";
+const MONGO_URI = "mongodb+srv://sakshigaikawad313_db_user:XzUSypypxF4akvwr@cluster0.idi5imw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 const ownerSchema = new mongoose.Schema({
   email: String,
@@ -15,7 +16,7 @@ async function addOwner() {
   try {
     await mongoose.connect(MONGO_URI);
 
-    const email = "satyavita81@gmail.com";
+    const email = "custo5172@gmail.com";
     const plainPassword = "Swapn1234";
 
     // Check if the owner already exists
