@@ -37,30 +37,53 @@ const verifyOwner = require('../middleware/verifyOwner');
 //   }
 // });
 
-router.post('/login', async (req, res) => {
+// TEMPORARY SAFE OWNER LOGIN (for testing)
+router.post('/simple-login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const owner = await Owner.findOne({ email: email });
+    console.log("🧠 Simple login attempt:", email);
 
+    // Find owner
+    const owner = await Owner.findOne({ email: email });
     if (!owner) {
+      console.log("⚠️ Owner not found");
       return res.status(404).json({ message: 'Owner not found' });
     }
 
-    const isMatch = await bcrypt.compare(password, owner.Password);
+    // If owner has hashedPassword, compare properly
+    const storedPassword = owner.hashedPassword || owner.password;
 
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+    // If password is stored as plain text (for testing)
+    if (storedPassword === password) {
+      console.log("✅ Plain password matched");
+    } else if (storedPassword && storedPassword.startsWith('$2')) {
+      // If hashed, use bcrypt
+      const bcrypt = require('bcryptjs');
+      const match = await bcrypt.compare(password, storedPassword);
+      if (!match) {
+        console.log("❌ Password incorrect");
+        return res.status(401).json({ message: 'Invalid password' });
+      }
+    } else {
+      console.log("❌ No valid password field found");
+      return res.status(400).json({ message: 'Invalid password field' });
     }
 
-    const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET, {
-      expiresIn: '1d',
-    });
+    // Generate JWT
+    const jwt = require('jsonwebtoken');
+    const token = jwt.sign(
+      { ownerId: owner._id, email: owner.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
 
-    res.status(200).json({ token });
+    console.log("🎉 Login successful for:", owner.email);
+    return res.status(200).json({ token });
+
   } catch (err) {
-    console.error("❌ LOGIN ERROR:", err);  // ADD THIS LINE
-    res.status(500).json({ message: 'Server error' });
+    console.error("🔥 Simple login error:", err);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
