@@ -5,9 +5,9 @@ const Owner = require('../models/Owner');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Order = require('../models/Order');
-// const verifyOwner = require('../middleware/verifyOwner');
+const verifyOwner = require('../middleware/verifyOwner');
 require("dotenv").config();
-const verifyOwnerToken = require("../middleware/ownerAuth");
+// const verifyOwnerToken = require("../middleware/ownerAuth");
 
 
 router.get("/dashboard", verifyOwnerToken, (req, res) => {
