@@ -38,36 +38,43 @@ const verifyOwner = require('../middleware/verifyOwner');
 // });
 
 // TEMPORARY SAFE OWNER LOGIN (for testing)
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  console.log('🧠 Login attempt:', email);
-
+router.post("/login", async (req, res) => {
   try {
-    const owner = await Owner.findOne({ email });
+    const { email, password } = req.body;
 
+    console.log("🧠 Login attempt:", email);
+
+    const owner = await Owner.findOne({ email });
     if (!owner) {
-      console.log('❌ Owner not found');
-      return res.status(404).json({ message: 'Owner not found' });
+      console.log("❌ No owner found");
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Use bcrypt.compare() because the password in DB is hashed
+    if (!owner.password) {
+      console.log("❌ No password field found for this owner:", owner);
+      return res.status(400).json({ message: "Owner has no password set" });
+    }
+
     const isMatch = await bcrypt.compare(password, owner.password);
     if (!isMatch) {
-      console.log('❌ Invalid credentials');
-      return res.status(401).json({ message: 'Invalid credentials' });
+      console.log("❌ Incorrect password");
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET, {
-      expiresIn: '1d',
-    });
+    const token = jwt.sign(
+      { ownerId: owner._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
 
-    console.log('✅ Login successful');
+    console.log("✅ Owner login successful:", owner.email);
     res.status(200).json({ token });
   } catch (error) {
-    console.error('❌ Login error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("❌ Login error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
+
 
 router.get('/orders', verifyOwner, async (req, res) => {
   try {

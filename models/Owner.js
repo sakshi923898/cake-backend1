@@ -1,17 +1,34 @@
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
+
+// const ownerSchema = new mongoose.Schema({
+//   email: {
+//     type: String,
+//     required: true,
+//     unique: true,
+//   },
+//   hashedPassword: {
+//     type: String,
+//     required: true,
+//   },
+// });
+
+// const Owner = mongoose.model('Owner', ownerSchema);
+
+// module.exports = Owner;
+import mongoose from "mongoose";
 
 const ownerSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
+    unique: true
   },
-  hashedPassword: {
+  password: {
     type: String,
-    required: true,
-  },
+    required: true
+  }
 });
 
-const Owner = mongoose.model('Owner', ownerSchema);
+const Owner = mongoose.model("Owner", ownerSchema);
 
-module.exports = Owner;
+export default Owner;
