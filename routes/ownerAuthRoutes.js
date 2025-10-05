@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Order = require('../models/Order');
 const verifyOwner = require('../middleware/verifyOwner');
+require("dotenv").config();
 
 
 // router.post('/login', async (req, res) => {
@@ -41,34 +42,26 @@ const verifyOwner = require('../middleware/verifyOwner');
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-
     console.log("🧠 Login attempt:", email);
 
     const owner = await Owner.findOne({ email });
     if (!owner) {
-      console.log("❌ No owner found");
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    if (!owner.password) {
-      console.log("❌ No password field found for this owner:", owner);
-      return res.status(400).json({ message: "Owner has no password set" });
+      return res.status(400).json({ message: "Owner not found" });
     }
 
     const isMatch = await bcrypt.compare(password, owner.password);
     if (!isMatch) {
-      console.log("❌ Incorrect password");
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(400).json({ message: "Invalid password" });
     }
 
     const token = jwt.sign(
       { ownerId: owner._id },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "24h" }
     );
 
-    console.log("✅ Owner login successful:", owner.email);
-    res.status(200).json({ token });
+    console.log("✅ Owner logged in successfully");
+    res.json({ token });
   } catch (error) {
     console.error("❌ Login error:", error);
     res.status(500).json({ message: "Server error" });
