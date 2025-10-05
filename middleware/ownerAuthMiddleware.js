@@ -17,18 +17,34 @@
 
 
 // middleware/ownerAuth.js
+
+// middleware/ownerAuth.js
 const jwt = require("jsonwebtoken");
 
 const verifyOwnerToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "No token provided" });
-
   try {
-    const decoded = jwt.verify(token, "your_secret_key");
-    req.owner = decoded; // this contains { ownerId, email, iat, exp }
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+
+    // Expected format: "Bearer <token>"
+    const token = authHeader.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
+      : authHeader;
+
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+
+    // Use secret from .env file
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.owner = decoded; // { ownerId, iat, exp }
     next();
-  } catch (err) {
-    return res.status(403).json({ message: "Invalid token" });
+  } catch (error) {
+    console.error("❌ JWT verification failed:", error.message);
+    return res.status(403).json({ message: "Invalid or expired token" });
   }
 };
 
