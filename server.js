@@ -42,6 +42,12 @@ app.use(cors({
 }));
 app.use(express.json());
 
+app.options("*", cors({
+  origin: "https://samrth.netlify.app",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+}));
+
 // server.js
 const notificationRoutes = require('./routes/notification');
 
