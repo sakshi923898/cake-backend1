@@ -7,6 +7,13 @@ const jwt = require('jsonwebtoken');
 const Order = require('../models/Order');
 const verifyOwner = require('../middleware/verifyOwner');
 
+// ✅ Owner Dashboard route (protected)
+router.get("/dashboard", require("../middleware/ownerAuthMiddleware"), (req, res) => {
+  res.json({
+    message: "Welcome to Owner Dashboard",
+    owner: req.owner
+  });
+});
 
 // router.post('/login', async (req, res) => {
 //   const { email, password } = req.body;
