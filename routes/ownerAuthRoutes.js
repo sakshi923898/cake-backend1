@@ -5,14 +5,7 @@ const Owner = require('../models/Owner');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Order = require('../models/Order');
-// const verifyOwner = require('../middleware/verifyOwner');
-require("dotenv").config();
-const verifyOwnerToken = require("../middleware/ownerAuth");
-
-
-router.get("/dashboard", verifyOwnerToken, (req, res) => {
-  res.json({ message: "Welcome to Owner Dashboard", owner: req.owner });
-});
+const verifyOwner = require('../middleware/verifyOwner');
 
 
 // router.post('/login', async (req, res) => {
@@ -45,35 +38,36 @@ router.get("/dashboard", verifyOwnerToken, (req, res) => {
 // });
 
 // TEMPORARY SAFE OWNER LOGIN (for testing)
-router.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    console.log("🧠 Login attempt:", email);
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  console.log('🧠 Login attempt:', email);
 
+  try {
     const owner = await Owner.findOne({ email });
+
     if (!owner) {
-      return res.status(400).json({ message: "Owner not found" });
+      console.log('❌ Owner not found');
+      return res.status(404).json({ message: 'Owner not found' });
     }
 
+    // Use bcrypt.compare() because the password in DB is hashed
     const isMatch = await bcrypt.compare(password, owner.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
+      console.log('❌ Invalid credentials');
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign(
-      { ownerId: owner._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "24h" }
-    );
+    const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET, {
+      expiresIn: '1d',
+    });
 
-    console.log("✅ Owner logged in successfully");
-    res.json({ token });
+    console.log('✅ Login successful');
+    res.status(200).json({ token });
   } catch (error) {
-    console.error("❌ Login error:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error('❌ Login error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
-
 
 router.get('/orders', verifyOwner, async (req, res) => {
   try {
@@ -112,47 +106,47 @@ router.get('/orders', verifyOwner, async (req, res) => {
 // TEMPORARY DELETE ALL ORDERS ROUTE
 
 
-// router.post('/orders', async (req, res) => {
-//   const { cakeId, customerName, contactNumber, address } = req.body;
+router.post('/orders', async (req, res) => {
+  const { cakeId, customerName, contactNumber, address } = req.body;
 
-//   try {
-//     const newOrder = new Order({
-//       cakeId,
-//       customerName,
-//       contact, // ✅ important
-//       address,
-//     });
+  try {
+    const newOrder = new Order({
+      cakeId,
+      customerName,
+      contact, // ✅ important
+      address,
+    });
 
-//     const cake = await Cake.findById(cakeId);
-//     const notification = new Notification({
-//       message: `New order for ${cake.name} from ${customerName}`,
-//       isRead: false,
-//     });
-//         await notification.save();
+    const cake = await Cake.findById(cakeId);
+    const notification = new Notification({
+      message: `New order for ${cake.name} from ${customerName}`,
+      isRead: false,
+    });
+        await notification.save();
 
-//     await newOrder.save();
-//     res.status(201).json({ message: 'Order placed successfully' });
-//   } catch (error) {
-//     res.status(500).json({ message: 'Failed to place order' });
-//   }
-// });
+    await newOrder.save();
+    res.status(201).json({ message: 'Order placed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to place order' });
+  }
+});
 // Example: GET /api/orders?customerName=Sakshi
-// router.get("/orders", async (req, res) => {
-//   try {
-//     const { customerName } = req.query;
+router.get("/orders", async (req, res) => {
+  try {
+    const { customerName } = req.query;
 
-//     let orders;
-//     if (customerName) {
-//       orders = await Order.find({ customerName }); // Filter only that customer's orders
-//     } else {
-//       orders = await Order.find(); // Owner gets all orders
-//     }
+    let orders;
+    if (customerName) {
+      orders = await Order.find({ customerName }); // Filter only that customer's orders
+    } else {
+      orders = await Order.find(); // Owner gets all orders
+    }
 
-//     res.json(orders);
-//   } catch (error) {
-//     res.status(500).json({ message: "Failed to fetch orders" });
-//   }
-// });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch orders" });
+  }
+});
 
 
 
