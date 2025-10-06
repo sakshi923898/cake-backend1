@@ -37,6 +37,7 @@ const corsOptions = {
 // app.use(cors(corsOptions));
 app.use(cors({
   origin: 'https://samrth.netlify.app', // ✅ your frontend Netlify domain
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
 app.use(express.json());
