@@ -10,9 +10,9 @@ require("dotenv").config();
 const verifyOwnerToken = require("../middleware/ownerAuth");
 
 
-// router.get("/dashboard", verifyOwnerToken, (req, res) => {
-//   res.json({ message: "Welcome to Owner Dashboard", owner: req.owner });
-// });
+router.get("/dashboard", verifyOwnerToken, (req, res) => {
+  res.json({ message: "Welcome to Owner Dashboard", owner: req.owner });
+});
 
 
 // router.post('/login', async (req, res) => {
