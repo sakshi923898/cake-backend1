@@ -36,12 +36,10 @@ const corsOptions = {
 
 // app.use(cors(corsOptions));
 app.use(cors({
-  origin: 'https://samrth.netlify.app',
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"], // ✅ Added PATCH + OPTIONS
-  allowedHeaders: ["Content-Type", "Authorization"],
+  origin: 'https://samrth.netlify.app', // ✅ your frontend Netlify domain
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
-
 app.use(express.json());
 
 
@@ -197,43 +195,17 @@ app.post('/api/orders', async (req, res) => {
 });
 
 // ✅ Confirm order as delivered
-// app.patch('/api/orders/:id/confirm', async (req, res) => {
-//   try {
-//     const order = await Order.findById(req.params.id);
-//     if (!order) return res.status(404).json({ message: 'Order not found' });
-
-//     order.status = 'Delivered';
-//     await order.save();
-//     res.status(200).json({ message: 'Order confirmed as delivered' });
-//   } catch (error) {
-//     console.error('❌ Error confirming delivery:', error);
-//     res.status(500).json({ message: 'Error confirming delivery' });
-//   }
-// });
-// SERVER: improved confirm route (paste into backend/server.js replacing the old route)
 app.patch('/api/orders/:id/confirm', async (req, res) => {
-  const orderId = req.params.id;
-  console.log(`PATCH /api/orders/${orderId}/confirm called`);
   try {
-    const order = await Order.findById(orderId);
-    if (!order) {
-      console.warn('Order not found:', orderId);
-      return res.status(404).json({ success: false, message: 'Order not found' });
-    }
-
-    // If the order is already delivered, return early
-    if (order.status && order.status.toLowerCase() === 'delivered') {
-      return res.status(200).json({ success: true, message: 'Order already delivered', order });
-    }
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
 
     order.status = 'Delivered';
     await order.save();
-
-    console.log('Order marked delivered:', orderId);
-    return res.status(200).json({ success: true, message: 'Order confirmed as delivered', order });
+    res.status(200).json({ message: 'Order confirmed as delivered' });
   } catch (error) {
-    console.error('Error confirming delivery:', error && error.stack ? error.stack : error);
-    return res.status(500).json({ success: false, message: 'Error confirming delivery', error: error.message || error });
+    console.error('❌ Error confirming delivery:', error);
+    res.status(500).json({ message: 'Error confirming delivery' });
   }
 });
 
