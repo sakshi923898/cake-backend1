@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Order = require('../models/Order');
 const verifyOwner = require('../middleware/verifyOwner');
+import nodemailer from "nodemailer";
 
 // ✅ Owner Dashboard route (protected)
 router.get("/dashboard", require("../middleware/ownerAuthMiddleware"), (req, res) => {
@@ -113,30 +114,75 @@ router.get('/orders', verifyOwner, async (req, res) => {
 // TEMPORARY DELETE ALL ORDERS ROUTE
 
 
-router.post('/orders', async (req, res) => {
-  const { cakeId, customerName, contactNumber, address } = req.body;
+// router.post('/orders', async (req, res) => {
+//   const { cakeId, customerName, contactNumber, address } = req.body;
+
+//   try {
+//     const newOrder = new Order({
+//       cakeId,
+//       customerName,
+//       contact, // ✅ important
+//       address,
+//     });
+
+//     const cake = await Cake.findById(cakeId);
+//     const notification = new Notification({
+//       message: `New order for ${cake.name} from ${customerName}`,
+//       isRead: false,
+//     });
+//         await notification.save();
+
+//     await newOrder.save();
+//     res.status(201).json({ message: 'Order placed successfully' });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Failed to place order' });
+//   }
+// });
+
+router.post("/orders", async (req, res) => {
+  const { cakeName, customerName, address, contact } = req.body;
 
   try {
     const newOrder = new Order({
-      cakeId,
+      cakeName,
       customerName,
-      contact, // ✅ important
       address,
+      contact,
     });
-
-    const cake = await Cake.findById(cakeId);
-    const notification = new Notification({
-      message: `New order for ${cake.name} from ${customerName}`,
-      isRead: false,
-    });
-        await notification.save();
 
     await newOrder.save();
-    res.status(201).json({ message: 'Order placed successfully' });
+
+    // === Email notification to owner ===
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: process.env.EMAIL_USER, // send to owner
+      subject: "🎂 New Cake Order Received",
+      text: `Hello Owner,\n\nA new order has been placed!\n\nCustomer: ${customerName}\nCake: ${cakeName}\nAddress: ${address}\nContact: ${contact}\n\nPlease log in to your dashboard to confirm delivery.\n\n- Cake Shop System`,
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log("📧 Email sent to owner successfully!");
+    } catch (emailError) {
+      console.error("❌ Failed to send email:", emailError);
+    }
+
+    res.status(201).json({ message: "Order placed and owner notified" });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to place order' });
+    console.error("Error placing order:", error);
+    res.status(500).json({ message: "Error placing order" });
   }
 });
+
+
 // Example: GET /api/orders?customerName=Sakshi
 router.get("/orders", async (req, res) => {
   try {
