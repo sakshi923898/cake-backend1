@@ -6,6 +6,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Order = require('../models/Order');
 const verifyOwner = require('../middleware/verifyOwner');
+import { sendOrderEmail } from "../emailService.js";
+import Notification from "../models/Notification.js";
 
 // ✅ Owner Dashboard route (protected)
 router.get("/dashboard", require("../middleware/ownerAuthMiddleware"), (req, res) => {
@@ -113,28 +115,80 @@ router.get('/orders', verifyOwner, async (req, res) => {
 // TEMPORARY DELETE ALL ORDERS ROUTE
 
 
-router.post('/orders', async (req, res) => {
-  const { cakeId, customerName, contactNumber, address } = req.body;
+// router.post('/orders', async (req, res) => {
+//   const { cakeId, customerName, contactNumber, address } = req.body;
 
+//   try {
+//     const newOrder = new Order({
+//       cakeId,
+//       customerName,
+//       contact, // ✅ important
+//       address,
+//     });
+
+//     const cake = await Cake.findById(cakeId);
+//     const notification = new Notification({
+//       message: `New order for ${cake.name} from ${customerName}`,
+//       isRead: false,
+//     });
+//         await notification.save();
+
+//     await newOrder.save();
+//     res.status(201).json({ message: 'Order placed successfully' });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Failed to place order' });
+//   }
+// });
+
+
+router.post("/", async (req, res) => {
   try {
+    const { cakeName, cakeId, customerName, address, contact } = req.body;
+
     const newOrder = new Order({
+      cakeName,
       cakeId,
       customerName,
-      contact, // ✅ important
       address,
+      contact,
+      createdAt: new Date(),
+      status: "Pending"
     });
-
-    const cake = await Cake.findById(cakeId);
-    const notification = new Notification({
-      message: `New order for ${cake.name} from ${customerName}`,
-      isRead: false,
-    });
-        await notification.save();
-
     await newOrder.save();
-    res.status(201).json({ message: 'Order placed successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to place order' });
+
+    // Persist a notification in DB for UI
+    try {
+      await Notification.create({
+        message: `New order by ${customerName} (${contact}) for ${cakeName || cakeId}`,
+        orderId: newOrder._id,
+        createdAt: new Date()
+      });
+    } catch (notifErr) {
+      console.error("Failed to save DB notification:", notifErr);
+      // don't block main flow
+    }
+
+    // Find the owner's email saved in DB (if you store owner)
+    let ownerEmail = process.env.EMAIL_USER; // fallback
+    try {
+      const owner = await Owner.findOne(); // assuming single owner
+      if (owner && owner.email) ownerEmail = owner.email;
+    } catch (ownerErr) {
+      console.error("Owner lookup error:", ownerErr);
+    }
+
+    // Attempt to send email (non-blocking for API success)
+    const emailResult = await sendOrderEmail(ownerEmail, newOrder);
+    if (!emailResult.ok) {
+      // Log and allow response — UI can show in-app notification
+      console.warn("Email not sent; will still return success. error:", emailResult.error);
+    }
+
+    return res.status(201).json({ message: "Order placed", order: newOrder, emailSent: !!emailResult.ok });
+
+  } catch (err) {
+    console.error("Order create error:", err && err.stack ? err.stack : err);
+    return res.status(500).json({ message: "Failed to place order", error: err.message || err });
   }
 });
 // Example: GET /api/orders?customerName=Sakshi
