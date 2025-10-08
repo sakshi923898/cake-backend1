@@ -36,10 +36,12 @@ const corsOptions = {
 
 // app.use(cors(corsOptions));
 app.use(cors({
-  origin: 'https://samrth.netlify.app', // ✅ your frontend Netlify domain
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: 'https://samrth.netlify.app',
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"], // ✅ Added PATCH + OPTIONS
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 }));
+
 app.use(express.json());
 
 
