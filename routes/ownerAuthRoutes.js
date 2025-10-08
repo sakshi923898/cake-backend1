@@ -226,7 +226,7 @@ import jwt from "jsonwebtoken";
 import Order from "../models/Order.js";
 import Owner from "../models/Owner.js";
 import verifyOwner from "../middleware/verifyOwner.js";
-import nodemailer from "nodemailer";
+const nodemailer = require("nodemailer");
 import dotenv from "dotenv";
 
 dotenv.config();
