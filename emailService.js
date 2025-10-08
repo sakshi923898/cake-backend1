@@ -34,7 +34,7 @@
 
 
 // backend/emailService.js
-import nodemailer from "nodemailer";
+const nodemailer = require("nodemailer");
 
 /**
  * Creates and returns a transporter. We set explicit host/port/secure
@@ -116,3 +116,4 @@ Please login to confirm or manage the order.
     return { ok: false, error: (err && err.message) || err };
   }
 }
+module.exports = { createTransporter };

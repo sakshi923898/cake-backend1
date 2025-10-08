@@ -15,7 +15,7 @@ const Notification = require('./models/Notification');
 const Owner = require('./models/Owner'); // you already have this model
 const { sendOrderNotification } = require('./emailService');
 
-import { createTransporter } from "./emailService.js";
+const { createTransporter } = require("./emailService.js");
 
 /* ------------------------- Middleware Setup ------------------------ */
 
