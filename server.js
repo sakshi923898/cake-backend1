@@ -14,9 +14,6 @@ const Notification = require('./models/Notification');
 
 const Owner = require('./models/Owner'); // you already have this model
 const { sendOrderNotification } = require('./emailService');
-
-const { createTransporter } = require("./emailService.js");
-
 /* ------------------------- Middleware Setup ------------------------ */
 
 // ✅ CORS for frontend
@@ -44,10 +41,7 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 }));
-
 app.use(express.json());
-
-
 
 // server.js
 const notificationRoutes = require('./routes/notification');
@@ -214,26 +208,7 @@ app.patch('/api/orders/:id/confirm', async (req, res) => {
   }
 });
 
-
-
-app.get("/api/test-email", async (req, res) => {
-  const transporter = createTransporter();
-  if (!transporter) return res.status(500).send("Transporter not configured (EMAIL_USER/EMAIL_PASS missing)");
-
-  try {
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_USER,
-      subject: "Test email from Cake Backend",
-      text: "If you got this, email sending is OK from the deployed service."
-    });
-    res.send("Email sent (check logs/inbox). Info: " + (info.messageId || info.response || JSON.stringify(info)));
-  } catch (err) {
-    console.error("test-email send failed:", err);
-    res.status(500).send("Email send failed: " + (err && err.message ? err.message : err));
-  }
-});
 /* ---------------------------- Server Start ------------------------- */
 
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
