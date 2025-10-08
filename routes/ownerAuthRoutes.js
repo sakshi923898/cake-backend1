@@ -219,26 +219,21 @@
 // });
 
 // module.exports = router;
-// routes/ownerAuthRoutes.js
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import Order from "../models/Order.js";
+import nodemailer from "nodemailer";
 import Owner from "../models/Owner.js";
+import Order from "../models/Order.js";
 import verifyOwner from "../middleware/verifyOwner.js";
-const nodemailer = require("nodemailer");
-import dotenv from "dotenv";
-
-dotenv.config();
+import ownerAuthMiddleware from "../middleware/ownerAuthMiddleware.js";
 
 const router = express.Router();
 
-// ✅ Owner Dashboard route (protected)
-import ownerAuthMiddleware from "../middleware/ownerAuthMiddleware.js";
 router.get("/dashboard", ownerAuthMiddleware, (req, res) => {
   res.json({
     message: "Welcome to Owner Dashboard",
-    owner: req.owner,
+    owner: req.owner
   });
 });
 
@@ -249,22 +244,12 @@ router.post("/login", async (req, res) => {
 
   try {
     const owner = await Owner.findOne({ email });
-
-    if (!owner) {
-      console.log("❌ Owner not found");
-      return res.status(404).json({ message: "Owner not found" });
-    }
+    if (!owner) return res.status(404).json({ message: "Owner not found" });
 
     const isMatch = await bcrypt.compare(password, owner.password);
-    if (!isMatch) {
-      console.log("❌ Invalid credentials");
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+    if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
-
+    const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
     console.log("✅ Login successful");
     res.status(200).json({ token });
   } catch (error) {
@@ -273,7 +258,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// ✅ Get all orders (Owner view)
+// ✅ Get all orders (owner only)
 router.get("/orders", verifyOwner, async (req, res) => {
   try {
     const orders = await Order.find().populate("cakeId").sort({ createdAt: -1 });
@@ -283,21 +268,14 @@ router.get("/orders", verifyOwner, async (req, res) => {
   }
 });
 
-// ✅ Place new order + send email notification to owner
+// ✅ Customer places order — send email to owner
 router.post("/orders", async (req, res) => {
   const { cakeName, customerName, address, contact } = req.body;
 
   try {
-    const newOrder = new Order({
-      cakeName,
-      customerName,
-      address,
-      contact,
-    });
-
+    const newOrder = new Order({ cakeName, customerName, address, contact });
     await newOrder.save();
 
-    // === Email notification to owner ===
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -308,61 +286,25 @@ router.post("/orders", async (req, res) => {
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_USER, // send to owner
+      to: process.env.EMAIL_USER,
       subject: "🎂 New Cake Order Received",
-      text: `Hello Owner,
-
-A new order has been placed!
-
-Customer: ${customerName}
-Cake: ${cakeName}
-Address: ${address}
-Contact: ${contact}
-
-Please log in to your dashboard to confirm delivery.
-
-- Cake Shop System`,
+      text: `Hello Owner,\n\nA new order has been placed!\n\nCustomer: ${customerName}\nCake: ${cakeName}\nAddress: ${address}\nContact: ${contact}\n\nPlease log in to your dashboard to confirm delivery.\n\n- Cake Shop System`,
     };
 
-    try {
-      await transporter.sendMail(mailOptions);
-      console.log("📧 Email sent to owner successfully!");
-    } catch (emailError) {
-      console.error("❌ Failed to send email:", emailError);
-    }
-
+    await transporter.sendMail(mailOptions);
+    console.log("📧 Email sent to owner successfully!");
     res.status(201).json({ message: "Order placed and owner notified" });
   } catch (error) {
-    console.error("Error placing order:", error);
+    console.error("❌ Error placing order:", error);
     res.status(500).json({ message: "Error placing order" });
   }
 });
 
-// ✅ Get customer orders (for customer side)
-router.get("/orders", async (req, res) => {
-  try {
-    const { customerName } = req.query;
-    let orders;
-
-    if (customerName) {
-      orders = await Order.find({ customerName });
-    } else {
-      orders = await Order.find();
-    }
-
-    res.json(orders);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch orders" });
-  }
-});
-
-// ✅ Delete specific order
+// ✅ Delete order
 router.delete("/delete/:id", async (req, res) => {
   try {
     const deletedOrder = await Order.findByIdAndDelete(req.params.id);
-    if (!deletedOrder) {
-      return res.status(404).json({ message: "Order not found" });
-    }
+    if (!deletedOrder) return res.status(404).json({ message: "Order not found" });
     res.json({ message: "Order deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: "Server error while deleting order" });
