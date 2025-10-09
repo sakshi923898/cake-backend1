@@ -33,25 +33,17 @@
 
 // backend/emailService.js
 // backend/emailService.js
-
-// backend/emailService.js
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 require('dotenv').config();
 
-// create reusable transporter object using Gmail SMTP
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+// Initialize Resend with your API key from environment variables
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function sendOrderEmail(orderDetails) {
   try {
-    const mailOptions = {
-      from: `"Cake Shop" <${process.env.EMAIL_USER}>`,
-      to: process.env.OWNER_EMAIL,
+    const data = await resend.emails.send({
+      from: 'onboarding@resend.dev', // ✅ Must use verified or official sender
+      to: process.env.OWNER_EMAIL || 'custo5172@gmail.com', // fallback email
       subject: '🎂 New Cake Order Received!',
       html: `
         <h2>New Order Notification</h2>
@@ -61,10 +53,9 @@ async function sendOrderEmail(orderDetails) {
         <hr>
         <p>Please prepare the cake as soon as possible 🍰</p>
       `,
-    };
+    });
 
-    await transporter.sendMail(mailOptions);
-    console.log('✅ Email sent successfully to owner');
+    console.log('✅ Email sent successfully:', data);
   } catch (error) {
     console.error('❌ Error sending email:', error);
   }
