@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Order = require('../models/Order');
 const verifyOwner = require('../middleware/verifyOwner');
+import { sendOrderEmail } from '../emailService.js';
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
