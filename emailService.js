@@ -32,16 +32,18 @@
 // module.exports = { sendOrderNotification };
 
 // backend/emailService.js
+// backend/emailService.js
 const { Resend } = require('resend');
 require('dotenv').config();
 
+// Initialize Resend with your API key from environment variables
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function sendOrderEmail(orderDetails) {
   try {
-    await resend.emails.send({
-      from: 'Cake Shop <onboarding@resend.dev>', // required by Resend
-      to: process.env.OWNER_EMAIL,
+    const data = await resend.emails.send({
+      from: 'onboarding@resend.dev', // ✅ Must use verified or official sender
+      to: process.env.OWNER_EMAIL || 'custo5172@gmail.com', // fallback email
       subject: '🎂 New Cake Order Received!',
       html: `
         <h2>New Order Notification</h2>
@@ -53,7 +55,7 @@ async function sendOrderEmail(orderDetails) {
       `,
     });
 
-    console.log('✅ Email sent to owner successfully');
+    console.log('✅ Email sent successfully:', data);
   } catch (error) {
     console.error('❌ Error sending email:', error);
   }
