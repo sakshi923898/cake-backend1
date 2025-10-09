@@ -31,15 +31,13 @@
 
 // module.exports = { sendOrderNotification };
 
-import { Resend } from 'resend';
-import dotenv from 'dotenv';
-
-dotenv.config();
+// backend/emailService.js
+const { Resend } = require('resend');
+require('dotenv').config();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Function to send order email to the owner
-export const sendOrderEmail = async (orderDetails) => {
+async function sendOrderEmail(orderDetails) {
   try {
     await resend.emails.send({
       from: 'Cake Shop <onboarding@resend.dev>', // required by Resend
@@ -47,11 +45,9 @@ export const sendOrderEmail = async (orderDetails) => {
       subject: '🎂 New Cake Order Received!',
       html: `
         <h2>New Order Notification</h2>
-        <p><strong>Customer:</strong> ${orderDetails.name}</p>
-        <p><strong>Email:</strong> ${orderDetails.email}</p>
-        <p><strong>Cake Name:</strong> ${orderDetails.cakeName}</p>
-        <p><strong>Price:</strong> ₹${orderDetails.price}</p>
-        <p><strong>Message:</strong> ${orderDetails.message}</p>
+        <p><strong>Customer Name:</strong> ${orderDetails.customerName}</p>
+        <p><strong>Contact:</strong> ${orderDetails.contact}</p>
+        <p><strong>Address:</strong> ${orderDetails.address}</p>
         <hr>
         <p>Please prepare the cake as soon as possible 🍰</p>
       `,
@@ -61,5 +57,6 @@ export const sendOrderEmail = async (orderDetails) => {
   } catch (error) {
     console.error('❌ Error sending email:', error);
   }
-};
+}
+
 module.exports = { sendOrderEmail };
