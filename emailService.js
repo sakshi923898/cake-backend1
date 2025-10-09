@@ -62,3 +62,4 @@ export const sendOrderEmail = async (orderDetails) => {
     console.error('❌ Error sending email:', error);
   }
 };
+module.exports = { sendOrderEmail };

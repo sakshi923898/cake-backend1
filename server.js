@@ -13,7 +13,7 @@ const app = express();
 const Notification = require('./models/Notification');
 
 const Owner = require('./models/Owner'); // you already have this model
-const { sendOrderNotification } = require('./emailService');
+const { sendOrderEmail } = require('./emailService');
 /* ------------------------- Middleware Setup ------------------------ */
 
 // ✅ CORS for frontend
@@ -183,7 +183,8 @@ app.post('/api/orders', async (req, res) => {
     const owner = await Owner.findOne();
     if (owner && owner.email) {
       // ignore errors from email – don’t block API response
-      sendOrderNotification(owner.email, newOrder).catch(console.error);
+      // sendOrderNotification(owner.email, newOrder).catch(console.error);
+      sendOrderEmail(owner.email, newOrder).catch(console.error);
     }
 
     res.status(201).json({ message: 'Order placed successfully', order: newOrder });
