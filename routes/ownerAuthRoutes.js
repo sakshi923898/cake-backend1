@@ -97,23 +97,23 @@ router.post('/orders', async (req, res) => {
   }
 });
 
-// router.post('/place-order', async (req, res) => {
-//   const { name, email, cakeName, price, message } = req.body;
+router.post('/place-order', async (req, res) => {
+  const { name, email, cakeName, price, message } = req.body;
 
-//   try {
-//     // Save order in MongoDB
-//     const order = new Order({ name, email, cakeName, price, message });
-//     await order.save();
+  try {
+    // Save order in MongoDB
+    const order = new Order({ name, email, cakeName, price, message });
+    await order.save();
 
-//     // Send notification email to owner
-//     await sendOrderEmail({ name, email, cakeName, price, message });
+    // Send notification email to owner
+    await sendOrderEmail({ name, email, cakeName, price, message });
 
-//     res.status(201).json({ success: true, message: 'Order placed successfully!' });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ success: false, message: 'Error placing order' });
-//   }
-// });
+    res.status(201).json({ success: true, message: 'Order placed successfully!' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Error placing order' });
+  }
+});
 // router.post('/place-order', async (req, res) => {
 //   const { name, email, cakeName, price, message } = req.body;
 
