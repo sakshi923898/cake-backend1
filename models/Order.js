@@ -2,7 +2,9 @@
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
-  customerName: String,
+  customerName:{ String, 
+    required: true,
+  },
   contact: {
     type: String,
     required: true,

@@ -97,20 +97,43 @@ router.get('/orders', verifyOwner, async (req, res) => {
 //   }
 // });
 
+// router.post('/place-order', async (req, res) => {
+//   const { name, email, cakeName, price, message } = req.body;
+
+//   try {
+//     // Save order in MongoDB
+//     const order = new Order({ name, email, cakeName, price, message });
+//     await order.save();
+
+//     // Send notification email to owner
+//     await sendOrderEmail({ name, email, cakeName, price, message });
+
+//     res.status(201).json({ success: true, message: 'Order placed successfully!' });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ success: false, message: 'Error placing order' });
+//   }
+// });
 router.post('/place-order', async (req, res) => {
   const { name, email, cakeName, price, message } = req.body;
 
   try {
-    // Save order in MongoDB
+    // ✅ Save order in MongoDB
     const order = new Order({ name, email, cakeName, price, message });
     await order.save();
 
-    // Send notification email to owner
-    await sendOrderEmail({ name, email, cakeName, price, message });
+    // ✅ Send notification email to owner (include all real order details)
+    await sendOrderEmail({
+      customerName: name,
+      email,
+      cakeName,
+      price,
+      message
+    });
 
     res.status(201).json({ success: true, message: 'Order placed successfully!' });
   } catch (err) {
-    console.error(err);
+    console.error('❌ Order placement error:', err);
     res.status(500).json({ success: false, message: 'Error placing order' });
   }
 });
