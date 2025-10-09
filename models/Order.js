@@ -30,10 +30,6 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true, // ✅ Correct syntax
   },
-  email: {
-    type: String,
-    required: true,
-  },
   contact: {
     type: String,
     required: true,
@@ -49,13 +45,6 @@ const orderSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: true,
-  },
-  message: {
-    type: String,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
   },
 });
 

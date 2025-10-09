@@ -70,7 +70,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function sendOrderEmail(orderDetails) {
   try {
-    const { customerName, email, cakeName, price, message } = orderDetails;
+    const { customerName, contact, cakeName, price, message } = orderDetails;
 
     await resend.emails.send({
       from: 'Cake Shop <onboarding@resend.dev>',
@@ -79,10 +79,10 @@ async function sendOrderEmail(orderDetails) {
       html: `
         <h2>New Order Notification</h2>
         <p><strong>Customer Name:</strong> ${customerName}</p>
-        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Contact:</strong> ${contact}</p>
         <p><strong>Cake Name:</strong> ${cakeName}</p>
         <p><strong>Price:</strong> ₹${price}</p>
-        <p><strong>Message:</strong> ${message}</p>
+        //<p><strong>Message:</strong> ${message}</p>
         <hr>
        
       `,
