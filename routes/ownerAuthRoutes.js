@@ -97,53 +97,25 @@ router.get('/orders', verifyOwner, async (req, res) => {
 //   }
 // });
 
-// router.post('/place-order', async (req, res) => {
-//   const { name, email, cakeName, price, message } = req.body;
+router.post('/place-order', async (req, res) => {
+  const { name, email, cakeName, price, message } = req.body;
 
-//   try {
-//     // Save order in MongoDB
-//     const order = new Order({ name, email, cakeName, price, message });
-//     await order.save();
-
-//     // Send notification email to owner
-//     await sendOrderEmail({ name, email, cakeName, price, message });
-
-//     res.status(201).json({ success: true, message: 'Order placed successfully!' });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ success: false, message: 'Error placing order' });
-//   }
-// });
-router.post('/orders', async (req, res) => {
   try {
-    const { customerName, contact, address, cakeName, price } = req.body;
-
-    // Validate
-    if (!customerName || !contact || !address || !cakeName || !price) {
-      return res.status(400).json({ message: "All fields are required!" });
-    }
-
-    // Save order
-    const order = new Order({
-      customerName,
-      contact,
-      address,
-      cakeName,
-      price,
-      status: 'Pending',
-    });
-
+    // Save order in MongoDB
+    const order = new Order({ name, email, cakeName, price, message });
     await order.save();
 
-    // Send email
-    await sendOrderEmail({ customerName, contact, address, cakeName, price });
+    // Send notification email to owner
+    await sendOrderEmail({ name, email, cakeName, price, message });
 
-    res.status(200).json({ message: "Order placed successfully!" });
-  } catch (error) {
-    console.error("Error placing order:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(201).json({ success: true, message: 'Order placed successfully!' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Error placing order' });
   }
 });
+
+
 // Example: GET /api/orders?customerName=Sakshi
 router.get("/orders", async (req, res) => {
   try {
