@@ -43,14 +43,14 @@ async function sendOrderEmail(orderDetails) {
       from: 'Cake Shop <onboarding@resend.dev>', // required by Resend
       to: process.env.OWNER_EMAIL,
       subject: '🎂 New Cake Order Received!',
-      html: `
-        <h2>New Order Notification</h2>
-        <p><strong>Customer Name:</strong> ${orderDetails.customerName}</p>
-        <p><strong>Contact:</strong> ${orderDetails.contact}</p>
-        <p><strong>Address:</strong> ${orderDetails.address}</p>
-        <hr>
-        <p>Please prepare the cake as soon as possible 🍰</p>
-      `,
+      // html: `
+      //   <h2>New Order Notification</h2>
+      //   <p><strong>Customer Name:</strong> ${orderDetails.customerName}</p>
+      //   <p><strong>Contact:</strong> ${orderDetails.contact}</p>
+      //   <p><strong>Address:</strong> ${orderDetails.address}</p>
+      //   <hr>
+      //   <p>Please prepare the cake as soon as possible 🍰</p>
+      // `,
     });
 
     console.log('✅ Email sent to owner successfully');
