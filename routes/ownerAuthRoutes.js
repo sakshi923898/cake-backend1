@@ -246,20 +246,29 @@ router.post('/orders', async (req, res) => {
   }
 });
 // Example: GET /api/orders?customerName=Sakshi
-router.get("/orders", async (req, res) => {
+// router.get("/orders", async (req, res) => {
+//   try {
+//     const { customerName } = req.query;
+
+//     let orders;
+//     if (customerName) {
+//       orders = await Order.find({ customerName }); // Filter only that customer's orders
+//     } else {
+//       orders = await Order.find(); // Owner gets all orders
+//     }
+
+//     res.json(orders);
+//   } catch (error) {
+//     res.status(500).json({ message: "Failed to fetch orders" });
+//   }
+// });
+router.get('/', async (req, res) => {
   try {
-    const { customerName } = req.query;
-
-    let orders;
-    if (customerName) {
-      orders = await Order.find({ customerName }); // Filter only that customer's orders
-    } else {
-      orders = await Order.find(); // Owner gets all orders
-    }
-
+    const orders = await Order.find().populate('cakeId');
     res.json(orders);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch orders" });
+    console.error('❌ Error fetching orders:', error);
+    res.status(500).json({ message: 'Failed to fetch orders' });
   }
 });
 
