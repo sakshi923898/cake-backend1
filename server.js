@@ -47,6 +47,7 @@ app.use(express.json());
 const notificationRoutes = require('./routes/notification');
 
 app.use('/api/notifications', notificationRoutes);
+app.use('/api', ownerAuthRoutes); // <-- Mount router here
 
 
 /* ------------------------- MongoDB Connection ---------------------- */

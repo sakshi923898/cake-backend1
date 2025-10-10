@@ -114,42 +114,43 @@ router.get('/orders', verifyOwner, async (req, res) => {
 //     res.status(500).json({ success: false, message: 'Error placing order' });
 //   }
 // });
-app.post('/api/orders', async (req, res) => {
-  const { customerName, contact, address, cakeId } = req.body;
+router.post('/orders', async (req, res) => {
+  try {
+    const { customerName, contact, address, cakeId } = req.body;
 
-  if (!customerName || !contact || !address || !cakeId) {
-    return res.status(400).json({ message: "All fields are required!" });
+    if (!customerName || !contact || !address || !cakeId) {
+      return res.status(400).json({ message: "All fields are required!" });
+    }
+
+    const cake = await Cake.findById(cakeId);
+    if (!cake) return res.status(404).json({ message: "Cake not found" });
+
+    const order = new Order({
+      customerName,
+      contact,
+      address,
+      cakeName: cake.name,
+      price: cake.price,
+      cakeId: cake._id,
+      status: 'Pending',
+    });
+
+    await order.save();
+
+    await sendOrderEmail({
+      customerName,
+      contact,
+      address,
+      cakeName: cake.name,
+      price: cake.price
+    });
+
+    res.status(200).json({ message: "Order placed successfully!" });
+  } catch (error) {
+    console.error("Error placing order:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
-
-  // Optional: fetch cake details if only ID is sent
-  const cake = await Cake.findById(cakeId); // Make sure you have Cake model
-  if (!cake) return res.status(404).json({ message: "Cake not found" });
-
-  const order = new Order({
-    customerName,
-    contact,
-    address,
-    cakeName: cake.name,
-    price: cake.price,
-    cakeId: cake._id,
-    status: 'Pending',
-  });
-
-  await order.save();
-
-  // Send email with correct fields
-  await sendOrderEmail({
-    customerName,
-    contact,
-    address,
-    cakeName: cake.name,
-    price: cake.price
-  });
-
-  res.status(200).json({ message: "Order placed successfully!" });
 });
-
-
 
 
 // Example: GET /api/orders?customerName=Sakshi
