@@ -37,20 +37,23 @@ const orderSchema = new mongoose.Schema({
   },
   address: {
     type: String,
-    required: true,
   },
-  cakeName: {
+  cakeName: {            // ✅ Added
     type: String,
     required: true,
   },
-  price: {
+  price: {               // ✅ Added
     type: Number,
     required: true,
+  },
+  cakeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Cake',
   },
   status: {
     type: String,
     default: 'Pending',
-  },
-}, { timestamps: true }); // ✅ Adds createdAt and updatedAt
+  }
+}, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);
