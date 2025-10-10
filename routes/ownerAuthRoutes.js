@@ -116,34 +116,27 @@ router.get('/orders', verifyOwner, async (req, res) => {
 // });
 router.post('/orders', async (req, res) => {
   try {
-    const { customerName, contact, address, cakeId } = req.body;
+    const { customerName, contact, address, cakeName, price } = req.body;
 
-    if (!customerName || !contact || !address || !cakeId) {
+    // Validate
+    if (!customerName || !contact || !address || !cakeName || !price) {
       return res.status(400).json({ message: "All fields are required!" });
     }
 
-    const cake = await Cake.findById(cakeId);
-    if (!cake) return res.status(404).json({ message: "Cake not found" });
-
+    // Save order
     const order = new Order({
       customerName,
       contact,
       address,
-      cakeName: cake.name,
-      price: cake.price,
-      cakeId: cake._id,
+      cakeName,
+      price,
       status: 'Pending',
     });
 
     await order.save();
 
-    await sendOrderEmail({
-      customerName,
-      contact,
-      address,
-      cakeName: cake.name,
-      price: cake.price
-    });
+    // Send email
+    await sendOrderEmail({ customerName, contact, address, cakeName, price });
 
     res.status(200).json({ message: "Order placed successfully!" });
   } catch (error) {
@@ -151,8 +144,6 @@ router.post('/orders', async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
-
 // Example: GET /api/orders?customerName=Sakshi
 router.get("/orders", async (req, res) => {
   try {
