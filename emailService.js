@@ -30,6 +30,37 @@
 // }
 
 // backend/emailService.js
+// const { Resend } = require('resend');
+// require('dotenv').config();
+
+// const resend = new Resend(process.env.RESEND_API_KEY);
+
+// async function sendOrderEmail(orderDetails) {
+//   try {
+//     await resend.emails.send({
+//       from: 'Cake Shop <onboarding@resend.dev>',
+//       to: process.env.OWNER_EMAIL,
+//       subject: '🎂 New Cake Order Received!',
+//       html: `
+//         <h2>🎉 New Cake Order Notification</h2>
+//         <p><strong>Customer Name:</strong> ${orderDetails.name}</p>
+//         <p><strong>Contact:</strong> ${orderDetails.contact}</p>
+//         <p><strong>Address:</strong> ${orderDetails.address}</p>
+//         <p><strong>Cake Name:</strong> ${orderDetails.cakeName}</p>
+//         <p><strong>Price:</strong> ₹${orderDetails.price}</p>
+//         <hr>
+//         <p>Please prepare the cake promptly 🍰</p>
+//       `,
+//     });
+
+//     console.log('✅ Email sent successfully');
+//   } catch (error) {
+//     console.error('❌ Error sending email:', error);
+//   }
+// }
+
+// module.exports = { sendOrderEmail };
+// backend/emailService.js
 const { Resend } = require('resend');
 require('dotenv').config();
 
@@ -38,22 +69,20 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 async function sendOrderEmail(orderDetails) {
   try {
     await resend.emails.send({
-      from: 'Cake Shop <onboarding@resend.dev>',
+      from: 'Cake Shop <onboarding@resend.dev>', // required by Resend
       to: process.env.OWNER_EMAIL,
       subject: '🎂 New Cake Order Received!',
       html: `
-        <h2>🎉 New Cake Order Notification</h2>
-        <p><strong>Customer Name:</strong> ${orderDetails.name}</p>
+        <h2>New Order Notification</h2>
+        <p><strong>Customer Name:</strong> ${orderDetails.customerName}</p>
         <p><strong>Contact:</strong> ${orderDetails.contact}</p>
         <p><strong>Address:</strong> ${orderDetails.address}</p>
-        <p><strong>Cake Name:</strong> ${orderDetails.cakeName}</p>
-        <p><strong>Price:</strong> ₹${orderDetails.price}</p>
         <hr>
-        <p>Please prepare the cake promptly 🍰</p>
+        <p>Please prepare the cake as soon as possible 🍰</p>
       `,
     });
 
-    console.log('✅ Email sent successfully');
+    console.log('✅ Email sent to owner successfully');
   } catch (error) {
     console.error('❌ Error sending email:', error);
   }

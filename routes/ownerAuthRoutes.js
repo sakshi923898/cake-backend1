@@ -97,45 +97,24 @@ router.get('/orders', verifyOwner, async (req, res) => {
 //   }
 // });
 
-// router.post('/place-order', async (req, res) => {
-//   const { name, email, cakeName, price, message } = req.body;
-
-//   try {
-//     // Save order in MongoDB
-//     const order = new Order({ name, email, cakeName, price, message });
-//     await order.save();
-
-//     // Send notification email to owner
-//     await sendOrderEmail({ name, email, cakeName, price, message });
-
-//     res.status(201).json({ success: true, message: 'Order placed successfully!' });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ success: false, message: 'Error placing order' });
-//   }
-// });
 router.post('/place-order', async (req, res) => {
-  const { name, contact, address, cakeName, price } = req.body;
+  const { name, email, cakeName, price, message } = req.body;
 
   try {
-    // ✅ Validate required fields
-    if (!name || !contact || !address || !cakeName || !price) {
-      return res.status(400).json({ success: false, message: 'All fields are required.' });
-    }
-
-    // ✅ Save order in MongoDB
-    const order = new Order({ name, contact, address, cakeName, price });
+    // Save order in MongoDB
+    const order = new Order({ name, email, cakeName, price, message });
     await order.save();
 
-    // ✅ Send email notification to owner
-    await sendOrderEmail({ name, contact, address, cakeName, price });
+    // Send notification email to owner
+    await sendOrderEmail({ name, email, cakeName, price, message });
 
     res.status(201).json({ success: true, message: 'Order placed successfully!' });
-  } catch (error) {
-    console.error('Order error:', error);
-    res.status(500).json({ success: false, message: 'Error placing order.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Error placing order' });
   }
 });
+
 
 // Example: GET /api/orders?customerName=Sakshi
 router.get("/orders", async (req, res) => {
