@@ -7,33 +7,79 @@ const jwt = require('jsonwebtoken');
 const Order = require('../models/Order');
 const verifyOwner = require('../middleware/verifyOwner');
 
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+// router.post('/login', async (req, res) => {
+//   const { email, password } = req.body;
 
+//   try {
+//     const owner = await Owner.findOne({ email: email });
+
+//     if (!owner) {
+//       return res.status(404).json({ message: 'Owner not found' });
+//     }
+
+//     // const isMatch = await bcrypt.compare(password, owner.password);
+//     const isMatch = await bcrypt.compare(password, owner.hashedPassword);
+
+
+//     if (!isMatch) {
+//       return res.status(401).json({ message: 'Invalid credentials' });
+//     }
+
+//     const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET, {
+//       expiresIn: '1d',
+//     });
+
+//     res.status(200).json({ token });
+//   } catch (err) {
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// });
+
+router.post('/login', async (req, res) => {
   try {
-    const owner = await Owner.findOne({ email: email });
+    console.log("🟢 Login attempt:", req.body); // <== Debug line
+
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      console.log("🔴 Missing email or password");
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
+    const owner = await Owner.findOne({ email });
+    console.log("🟣 Owner found:", owner);
 
     if (!owner) {
+      console.log("🔴 Owner not found for email:", email);
       return res.status(404).json({ message: 'Owner not found' });
     }
 
-    // const isMatch = await bcrypt.compare(password, owner.password);
-    const isMatch = await bcrypt.compare(password, owner.hashedPassword);
-
+    const isMatch = await bcrypt.compare(password, owner.password);
+    console.log("🟠 Password match:", isMatch);
 
     if (!isMatch) {
+      console.log("🔴 Invalid password for:", email);
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ ownerId: owner._id }, process.env.JWT_SECRET, {
+    if (!process.env.JWT_SECRET) {
+      console.log("🔴 JWT_SECRET is missing in .env");
+      return res.status(500).json({ message: 'Server misconfiguration' });
+    }
+
+    const token = jwt.sign({ id: owner._id, role: 'owner' }, process.env.JWT_SECRET, {
       expiresIn: '1d',
     });
 
-    res.status(200).json({ token });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    console.log("🟢 Token created successfully");
+
+    res.status(200).json({ token, owner });
+  } catch (error) {
+    console.error("🔥 Login Error:", error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
+
 router.get('/orders', verifyOwner, async (req, res) => {
   try {
     const orders = await Order.find().populate('cakeId').sort({ createdAt: -1 });
